@@ -871,10 +871,14 @@ function CreatorPanelSection() {
                   </>
                 )}
 
-                <div className="panel-actions">
-                  <button onClick={resetPanel} className="btn-reset">
+                <div className="panel-actions" style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap", marginTop: "2rem" }}>
+                  <button onClick={resetPanel} className="btn-outline">
                     <RefreshCw style={{ width: 18, height: 18 }} />
                     Yeniden Başla
+                  </button>
+                  <button onClick={() => handleStyleSelect(selectedStyle)} className="btn-outline">
+                    <RefreshCw style={{ width: 18, height: 18 }} />
+                    Fikirleri Beğenmedim, Değiştir
                   </button>
                   <a href="https://randevu.withnazligunes.com" className="btn-primary">
                     Birlikte Kurgulayalım →

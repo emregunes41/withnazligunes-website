@@ -17,14 +17,13 @@ export async function generateIdeasAction(niche, style) {
     Kullanıcının verileri:
     Niş: ${niche}
     Tarz: ${style}
-
     Görevin:
-    1. Bu niş ve tarza uygun, etkileşim (viral) potansiyeli yüksek 3 adet içerik fikri üret.
+    1. Bu niş ve tarza uygun, etkileşim (viral) potansiyeli yüksek, KESİNLİKLE VE TAM OLARAK 3 ADET ÇOK DETAYLI içerik fikri üret. Sadece 1 tane üretme, mutlaka 3 tane farklı fikir ver.
     2. Her fikir için:
-       - 'title': Çarpıcı bir başlık.
-       - 'desc': Stratejik bir açıklama (neden işe yarayacağı).
-       - 'scenario': 3 adımlı bir senaryo (Hook, Body, CTA formatında, her adım yeni satırda).
-    3. 1 adet 'tip': Ufuk açıcı, nişe özel bir uzman tavsiyesi.
+       - 'title': Çarpıcı ve dikkat çekici bir başlık.
+       - 'desc': Stratejik ve ufuk açıcı, vizyon katan çok detaylı bir açıklama (neden işe yarayacağı, hangi psikolojik tetikleyicileri kullandığı vb. en az 3-4 cümle).
+       - 'scenario': Çekim açıları, kamera hareketleri ve kurgu fikirleri içeren çok detaylı ve profesyonel 3 adımlı bir senaryo (Hook, Body, CTA formatında, her adım ayrı satırda).
+    3. 1 adet 'tip': Daha fazla etkileşim için ufuk açıcı, nişe özel, nadir bilinen bir profesyonel ipucu.
 
     DİL: TÜRKÇE
     FORMAT: Sadece saf JSON objesi döndür. Markdown veya ek açıklama ekleme.
