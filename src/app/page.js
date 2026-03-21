@@ -690,19 +690,15 @@ function CreatorPanelSection() {
     setSelectedStyle(styleId);
     setStep(3);
     
-    const isCustom = selectedNiche === "custom";
-    const isStationary = RECOMMENDATIONS[selectedNiche];
-
-    if (isCustom || !isStationary) {
-      setIsLoading(true);
-      try {
-        const res = await generateIdeasAction(currentNicheLabel, styleId);
-        setAiRecommendations(res);
-      } catch (err) {
-        console.error("AI Error:", err);
-      } finally {
-        setIsLoading(false);
-      }
+    setIsLoading(true);
+    setAiRecommendations(null);
+    try {
+      const res = await generateIdeasAction(currentNicheLabel, styleId);
+      setAiRecommendations(res);
+    } catch (err) {
+      console.error("AI Error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
