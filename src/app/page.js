@@ -17,7 +17,14 @@ import {
   Mail,
   Menu,
   X,
+  Plus,
+  Zap,
+  Lightbulb,
+  RefreshCw,
+  Loader2,
+  Cpu,
 } from "lucide-react";
+import { generateIdeasAction } from "./actions/generate-ideas";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,29 +35,211 @@ const fadeUp = {
   }),
 };
 
+const NICHES = [
+  { id: "moda", label: "Moda & Stil", icon: "👗" },
+  { id: "tech", label: "Teknoloji", icon: "💻" },
+  { id: "yemek", label: "Yemek & Tarif", icon: "🍳" },
+  { id: "seyahat", label: "Seyahat", icon: "✈️" },
+  { id: "finans", label: "Finans & Girişim", icon: "💰" },
+  { id: "spor", label: "Spor & Fitness", icon: "💪" },
+  { id: "gelisim", label: "Kişisel Gelişim", icon: "🌱" },
+];
+
+const STYLES = [
+  { id: "minimalist", label: "Minimalist & Sade", icon: "✨" },
+  { id: "energetic", label: "Enerjik & Dinamik", icon: "⚡" },
+  { id: "aesthetic", label: "Estetik & Cinematic", icon: "🎞️" },
+  { id: "educational", label: "Eğitici & Bilgilendirici", icon: "📚" },
+  { id: "story", label: "Hikaye Anlatıcılığı", icon: "📖" },
+];
+
+const RECOMMENDATIONS = {
+  moda: {
+    minimalist: {
+      ideas: [
+        {
+          title: "Kapsül Gardırop Sırları",
+          desc: "Az eşyayla 15+ kombin yaparak sürdürülebilir moda üzerinden bağ kurun.",
+          scenario: "1. Hook: 'Elinizde sadece 5 parça olsa kaç kombin yapabilirsiniz? Ben 15 yaptım!' \n2. Body: Her parçayı farklı ortamlar için (iş, kahve, akşam) eşleştir. \n3. CTA: 'Senin favori parçan hangisi? Yorumlara yaz!'"
+        },
+        {
+          title: "Nötr Tonların Gücü",
+          desc: "Baştan aşağı bej/beyaz giyinmenin 'pahalı' görünme sırlarını anlatın.",
+          scenario: "1. Hook: 'Old money estetiği için binlerce dolar harcamanıza gerek yok.' \n2. Body: Dokuların (keten, ipek, pamuk) önemini ve ton sür ton giyinmeyi göster. \n3. CTA: 'Hangi dokuyu daha çok seviyorsun?'"
+        },
+        {
+          title: "Aksesuarla Değişim",
+          desc: "Tek bir elbiseyi 3 farklı takı/çanta setiyle nasıl dönüştürürsünüz?",
+          scenario: "1. Hook: 'Aynı elbiseyle hem düğüne hem işe gidilir mi?' \n2. Body: Önce sade, sonra gösterişli aksesuarlarla geçiş yap. \n3. CTA: 'Gündüz mü gece mi favorin?'"
+        }
+      ],
+      tip: "Arka planını nötr tonlarda tut ve doğal ışığı maksimum seviyede kullan.",
+    },
+    energetic: {
+      ideas: [
+        {
+          title: "Hızlı Geçişli Kombinler",
+          desc: "Müzik ritmine göre kıyafet değiştirdiğiniz, yüksek enerjili bir Reels.",
+          scenario: "1. Hook: Parmağını şıklatınca kıyafetin değişsin. \n2. Body: Haftanın her günü için bir kombin. \n3. CTA: 'Sence en iyisi hangisi?'"
+        },
+        {
+          title: "Bu Sezonun 3 Favorisi",
+          desc: "Mağazada denediğiniz ve kesinlikle alınması gereken parçalar.",
+          scenario: "1. Hook: 'Bu parçalar yakında tükenecek, benden söylemesi!' \n2. Body: Ürünleri üzerinde göster ve neden sevdiğini 1-2 kelimeyle anlat. \n3. CTA: 'Link isteyenler yorumlara Link yazsın!'"
+        }
+      ],
+      tip: "Trend müziklerin beat-drop noktalarına göre geçişlerini ayarla, enerjin yüksek olsun!",
+    },
+    educational: {
+      ideas: [
+        {
+          title: "Vücut Tipine Göre Giyim",
+          desc: "Hangi kesimlerin hangi vücut tipinde daha iyi durduğunu gösteren rehber.",
+          scenario: "1. Hook: 'Boyunuzu daha uzun göstermek istiyorsanız buraya bakın.' \n2. Body: Bel yüksekliği ve paça boyu gibi detayları yan yana karşılaştırmalı göster. \n3. CTA: 'Daha fazla tüyo için takip et!'"
+        }
+      ],
+      tip: "Bilgileri ekranda 'bullet point' olarak göster ki izleyici ekran görüntüsü alabilsin.",
+    },
+    aesthetic: {
+      ideas: [
+        {
+          title: "Cinematic Hazırlık (GRWM)",
+          desc: "Yavaş çekimler ve loş ışıkla hazırlık sürecinizi sanatsallaştırın.",
+          scenario: "1. Hook: Güneş ışığının vurduğu bir ayna ve sabah kahvesi. \n2. Body: Kıyafetlerin asansörde veya sokaktaki yansımaları. \n3. CTA: 'Huzurlu bir gün dilerim...'"
+        }
+      ],
+      tip: "Renk paletine (Color Grading) önem ver, yumuşak tonlar estetik algıyı artırır.",
+    },
+    story: {
+      ideas: [
+        {
+          title: "Stil Yolculuğum",
+          desc: "Eski hallerinizden bugünkü tarzınıza geçişinizi anlatan ilham verici video.",
+          scenario: "1. Hook: 'Moda anlayışım nasıl değişti? Sürpriz sona hazır olun.' \n2. Body: Yıllar içindeki tarz değişimini fotoğraflarla anlat. \n3. CTA: 'Senin tarzın nasıl değişti?'"
+        }
+      ],
+      tip: "Kendi sesinle (Voiceover) konuşmak samimiyetinizi 2 katına çıkarır.",
+    }
+  },
+  tech: {
+    minimalist: {
+      ideas: [
+        {
+          title: "Kablosuz ve Sade Setup",
+          desc: "Masanızdaki gereksiz kablolardan kurtulma ve minimal çalışma alanı.",
+          scenario: "1. Hook: Masanın eski dağınık hali ve yeni hali. \n2. Body: Kablo düzenleyici ve minimalist aksesuarları göster. \n3. CTA: 'Masa düzenine 1-10 arası kaç verirsin?'"
+        }
+      ],
+      tip: "Çekimlerde aşırı 'RGB' ışık yerine yumuşak, beyaz/sıcak ışık kullan.",
+    },
+    energetic: {
+      ideas: [
+        {
+          title: "iPhone Gizli Özelliği",
+          desc: "Kimsenin bilmediği, hayat kolaylaştıran bir iOS kısayolu.",
+          scenario: "1. Hook: 'Telefonunuzda bu özelliği hala kullanmıyor musunuz?' \n2. Body: Adım adım ayarları göster. \n3. CTA: 'Kaydet ki unutma!'"
+        }
+      ],
+      tip: "Videonun ilk 3 saniyesinde mutlaka şaşırtıcı bir sonuç göster (Hook).",
+    },
+    educational: {
+      ideas: [
+        {
+          title: "Yapay Zeka ile Verimlilik",
+          desc: "İşlerinizi 10 kat hızlandıracak 3 yapay zeka aracı.",
+          scenario: "1. Hook: 'Yapay zeka işinizi elinizden almayacak, onu kullananlar alacak.' \n2. Body: Araçları ekran kaydıyla hızlıca tanıt. \n3. CTA: 'Takipte kal!'"
+        }
+      ],
+      tip: "Karmaşık terimleri analogiler kullanarak açıkla, herkesin anlayabileceği dil kullan.",
+    },
+    aesthetic: {
+      ideas: [
+        {
+          title: "ASMR Klavye Deneyimi",
+          desc: "Mekanik klavye sesleri ve makro çekimlerle teknoloji estetiği.",
+          scenario: "1. Hook: Klavyeye basan bir el ve yüksek kaliteli ses. \n2. Body: Tuşların ve ışıkların makro (yakın) çekimleri. \n3. CTA: 'Sesi sevenler buraya!'"
+        }
+      ],
+      tip: "Detay çekimlerde (Macro) yüksek çözünürlük ve sığ alan derinliği kullan.",
+    }
+  },
+  default: {
+    minimalist: {
+      ideas: [
+        {
+          title: "Sabah Rutinim",
+          desc: "Güne sade ve odaklı başlamanın 3 basit adımı.",
+          scenario: "1. Hook: Telefonu uçak modunda bırakmanın huzuru. \n2. Body: Meditasyon, okuma ve planlama. \n3. CTA: 'Senin sabah ritüelin ne?'"
+        }
+      ],
+      tip: "Gürültüden uzak, temiz ses kaydı almayı unutma.",
+    },
+    energetic: {
+      ideas: [
+        {
+          title: "Bu Hatayı Sakın Yapma!",
+          desc: "Sektörünüzde yeni başlayanların yaptığı en büyük yanlış.",
+          scenario: "1. Hook: 'Eğer X sonucunu istiyorsan, Y yapmayı hemen bırak!' \n2. Body: Nedenini ve doğrusunu hızlıca anlat. \n3. CTA: 'Daha fazlası için profilime bak!'"
+        }
+      ],
+      tip: "Videonun temposunu hiç düşürme, hızlı kesimler (Jump cuts) kullan.",
+    },
+    educational: {
+      ideas: [
+        {
+          title: "Sıfırdan Başlama Rehberi",
+          desc: "Herhangi bir konuda uzmanlaşmak için izlenecek 3 durak.",
+          scenario: "1. Hook: 'Sıfırdan X olmak imkansız değil.' \n2. Body: 1. Adım Eğitim, 2. Uygulama, 3. Geri Bildirim. \n3. CTA: 'Sen hangi aşamadasın?'"
+        }
+      ],
+      tip: "İnsanlara 'Neden'ini anlat, sonra 'Nasıl'ına geç.",
+    },
+    aesthetic: {
+      ideas: [
+        {
+          title: "Bir Günün Özeti (Moody)",
+          desc: "Hayatınızdan kesitlerin cinematic kurgusu.",
+          scenario: "1. Hook: Şık bir mekan girişi veya gün doğumu. \n2. Body: Estetik yemekler, kitaplar ve detaylar. \n3. CTA: 'Anı yaşa...'"
+        }
+      ],
+      tip: "Slow motion ve doğru müzik seçimi her şeyi estetikleştirir.",
+    },
+    story: {
+      ideas: [
+        {
+          title: "Nereden Nereye?",
+          desc: "Başarı hikayenizi veya zorlandığınız bir süreci samimiyetle paylaşın.",
+          scenario: "1. Hook: 'Bana yapamazsın dediklerinde başladığım yer burasıydı.' \n2. Body: Başlangıçtaki zorluklar ve dönüm noktaları. \n3. CTA: 'Senin ilham kaynağın ne?'"
+        }
+      ],
+      tip: "Samimiyet en büyük virallik anahtarıdır.",
+    }
+  }
+};
+
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const services = [
     {
-      icon: <Video className="w-5 h-5" />,
       title: "Birebir Danışmanlık",
       desc: "45 dakikalık yoğun, hedefe yönelik online strateji toplantısı.",
+      photo: "/hero-nazli.jpg",
     },
     {
-      icon: <GraduationCap className="w-5 h-5" />,
       title: "Sosyal Medya Eğitimleri",
       desc: "Başlangıçtan ileri seviyeye sosyal medya yönetimi eğitimleri.",
+      photo: "/assets/photos/IMG_4326.jpg",
     },
     {
-      icon: <Palette className="w-5 h-5" />,
       title: "İçerik Kurgusu",
       desc: "Profilinize ve kitlenize özel video/içerik senaryo planlaması.",
+      photo: "/assets/photos/Tezza-9494.JPG",
     },
     {
-      icon: <Camera className="w-5 h-5" />,
       title: "UGC Çekimleri",
       desc: "Markalar için kullanıcı odaklı, özgün içerik üretimi.",
+      photo: "/assets/photos/Görüntü 11.03.2026 00.01.JPG",
     },
   ];
 
@@ -114,6 +303,16 @@ export default function Home() {
       {/* BG ORBS */}
       <div className="hero-bg-orb-1" />
       <div className="hero-bg-orb-2" />
+
+      {/* Scattered Background Photos */}
+      <motion.div 
+        className="floating-img-container" 
+        style={{ top: '15%', right: '-5%', width: '300px', height: '400px', rotate: '12deg' }}
+        animate={{ y: [0, -20, 0], rotate: [12, 10, 12] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <img src="/assets/photos/IMG_4102.JPG" alt="" />
+      </motion.div>
 
       {/* HERO SECTION */}
       <section className="hero">
@@ -187,9 +386,19 @@ export default function Home() {
         </div>
       </section>
 
+      <CreatorPanelSection />
+
       {/* SERVICES SECTION */}
       <hr className="section-divider" />
-      <section className="section" id="hizmetler">
+      <section className="section" id="hizmetler" style={{ position: 'relative' }}>
+        <motion.div 
+          className="floating-img-container" 
+          style={{ bottom: '-10%', left: '-10%', width: '350px', height: '450px', rotate: '-8deg', opacity: 0.1 }}
+          animate={{ y: [0, 20, 0], rotate: [-8, -6, -8] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <img src="/assets/photos/IMG_4326.jpg" alt="" />
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -216,8 +425,10 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <div className="service-card-icon">{srv.icon}</div>
-              <h3>{srv.title}</h3>
+              <div className="service-title-container">
+                <img src={srv.photo} alt={srv.title} className="service-avatar" />
+                <h3>{srv.title}</h3>
+              </div>
               <p>{srv.desc}</p>
             </motion.div>
           ))}
@@ -226,7 +437,15 @@ export default function Home() {
 
       {/* TRAININGS / DOWNLOADABLES */}
       <hr className="section-divider" />
-      <section className="section" id="egitimler">
+      <section className="section" id="egitimler" style={{ position: 'relative' }}>
+        <motion.div 
+          className="floating-img-container" 
+          style={{ top: '5%', right: '-12%', width: '400px', height: '500px', rotate: '5deg' }}
+          animate={{ y: [0, -30, 0], rotate: [5, 7, 5] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <img src="/assets/photos/Tezza-9494.JPG" alt="" />
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -350,13 +569,16 @@ export default function Home() {
 
         <div className="coming-soon-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {[
-            "DV8vX7liJo1",
-            "DV0RaRYCPr3",
-            "DVxz1hkCOk8",
-            "DVvQdVuiLXv"
-          ].map((id, i) => (
-            <motion.div
-              key={id}
+            "/assets/videos/reels-1.mp4",
+            "/assets/videos/reels-2.mp4",
+            "/assets/videos/reels-3.mp4",
+            "/assets/videos/reels-4.mp4"
+          ].map((src, i) => (
+            <motion.a
+              key={i}
+              href="https://www.instagram.com/withnazligunes"
+              target="_blank"
+              rel="noopener noreferrer"
               className="glass"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -367,43 +589,43 @@ export default function Home() {
                 overflow: "hidden",
                 aspectRatio: "9/16",
                 background: "var(--bg-card)",
-                position: "relative"
+                position: "relative",
+                display: "block"
               }}
             >
-              <div style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden"
-              }}>
-                <iframe
-                  src={`https://www.instagram.com/reel/${id}/embed/`}
-                  width="100%"
-                  height="1000px" // Fixed large height to ensure video is rendered fully
-                  frameBorder="0"
-                  scrolling="no"
-                  allowtransparency="true"
-                  style={{ 
-                    border: "none",
-                    transform: "scale(1.6)", // Zoom deep into the video
-                    transformOrigin: "center center",
-                    marginTop: "-50px" // Adjust vertical centering to hide footer better
-                  }}
-                ></iframe>
-              </div>
-            </motion.div>
+              <video
+                src={src}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+              <div className="absolute inset-0 bg-black/20 hover:bg-transparent transition-colors duration-300 pointer-events-none" />
+            </motion.a>
           ))}
         </div>
+
       </section>
 
       {/* CTA BANNER */}
       <hr className="section-divider" />
-      <section className="section" style={{ textAlign: "center" }}>
+      <section className="section" style={{ textAlign: "center", position: 'relative' }}>
+        <motion.div 
+          className="floating-img-container" 
+          style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <img src="/assets/photos/Görüntü 11.03.2026 00.01.JPG" alt="" />
+        </motion.div>
         <motion.div
           className="glass glow-gold"
           style={{ padding: "4rem 2rem", borderRadius: "1.5rem", maxWidth: "800px", margin: "0 auto" }}
@@ -445,5 +667,266 @@ export default function Home() {
       </footer>
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
     </>
+  );
+}
+
+function CreatorPanelSection() {
+  const [step, setStep] = useState(1);
+  const [selectedNiche, setSelectedNiche] = useState("");
+  const [customNiche, setCustomNiche] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState("");
+  const [selectedIdea, setSelectedIdea] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [aiRecommendations, setAiRecommendations] = useState(null);
+
+  const handleNicheSelect = (id) => {
+    setSelectedNiche(id || "custom");
+    setStep(2);
+  };
+
+  const currentNicheLabel = selectedNiche === "custom" ? customNiche : (NICHES.find(n => n.id === selectedNiche)?.label || customNiche);
+
+  const handleStyleSelect = async (styleId) => {
+    setSelectedStyle(styleId);
+    setStep(3);
+    
+    const isCustom = selectedNiche === "custom";
+    const isStationary = RECOMMENDATIONS[selectedNiche];
+
+    if (isCustom || !isStationary) {
+      setIsLoading(true);
+      try {
+        const res = await generateIdeasAction(currentNicheLabel, styleId);
+        setAiRecommendations(res);
+      } catch (err) {
+        console.error("AI Error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleIdeaDetail = (idea) => {
+    setSelectedIdea(idea);
+    setStep(4);
+  };
+
+  const getRecommendations = () => {
+    if (aiRecommendations) return aiRecommendations;
+    const nicheKey = selectedNiche === "custom" ? "default" : selectedNiche;
+    const nicheData = RECOMMENDATIONS[nicheKey] || RECOMMENDATIONS.default;
+    return nicheData[selectedStyle] || RECOMMENDATIONS.default[selectedStyle];
+  };
+
+  const resetPanel = () => {
+    setStep(1);
+    setSelectedNiche("");
+    setCustomNiche("");
+    setSelectedStyle("");
+    setSelectedIdea(null);
+    setAiRecommendations(null);
+    setIsLoading(false);
+  };
+
+  return (
+    <section className="section" id="creator-panel" style={{ position: 'relative' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="glass creator-panel-card glow-gold"
+      >
+        <div className="creator-panel-header">
+          <span className="section-badge">
+            <Zap style={{ width: 12, height: 12 }} />
+            İçerik Paneli
+          </span>
+          <h2 className="section-title">Senin İçin Viral Fikirler</h2>
+          <p className="section-subtitle">Nişini ve tarzını seç, Nazlı'nın senin için hazırladığı viral potansiyeli yüksek fikirleri gör.</p>
+        </div>
+
+        <div className="creator-panel-body">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="step-content"
+              >
+                <div className="step-count">ADIM 1 / 2</div>
+                <h3 className="step-heading">Hangi nişte içerik üretiyorsun?</h3>
+                <div className="niche-grid">
+                  {NICHES.map((n) => (
+                    <button key={n.id} onClick={() => handleNicheSelect(n.id)} className="niche-btn glass glass-hover">
+                      <span className="niche-icon">{n.icon}</span>
+                      <span className="niche-label">{n.label}</span>
+                    </button>
+                  ))}
+                  <div className="custom-niche-container glass">
+                    <input 
+                      type="text" 
+                      placeholder="Kendi Nişini Yaz..." 
+                      value={customNiche}
+                      onChange={(e) => setCustomNiche(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && customNiche && handleNicheSelect("custom")}
+                      className="custom-input"
+                    />
+                    <button 
+                      onClick={() => customNiche && handleNicheSelect("custom")}
+                      disabled={!customNiche}
+                      className="custom-plus-btn"
+                    >
+                      <Plus style={{ width: 18, height: 18 }} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="step-content"
+              >
+                <div className="step-count">ADIM 2 / 2</div>
+                <div className="step-header-with-badge">
+                  <h3 className="step-heading">İçerik tarzın nasıl olsun?</h3>
+                  <div className="active-selection-badge">{currentNicheLabel}</div>
+                </div>
+                <div className="style-grid">
+                  {STYLES.map((s) => (
+                    <button key={s.id} onClick={() => handleStyleSelect(s.id)} className="style-btn glass glass-hover">
+                      <span className="style-icon">{s.icon}</span>
+                      <span className="style-label">{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => setStep(1)} className="back-link">← Niş Seçimine Dön</button>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="results-content"
+              >
+                <div className="results-header">
+                  <div className="results-badge-group">
+                    <span className="res-badge">{currentNicheLabel}</span>
+                    <span className="res-badge">{STYLES.find(s => s.id === selectedStyle)?.label}</span>
+                    {aiRecommendations && <span className="res-badge ai-badge"><Cpu size={12} /> AI Modeli</span>}
+                  </div>
+                  <h3 className="results-heading">Nazlı'dan Stratejik Öneriler</h3>
+                </div>
+
+                {isLoading ? (
+                  <div className="ai-loading-container">
+                    <div className="ai-loader-pulse" />
+                    <Loader2 className="ai-spinner" />
+                    <p className="ai-loading-text">Nazlı'nın Yapay Zekası Senin İçin Kurguluyor...</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="ideas-container">
+                      {getRecommendations().ideas.map((idea, idx) => (
+                        <motion.div 
+                          key={idx} 
+                          className="idea-item glass"
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.15 }}
+                        >
+                          <div className="idea-header">
+                            <span className="idea-number">0{idx + 1}</span>
+                            <div className="viral-indicator">
+                              <Zap style={{ width: 10, height: 10 }} />
+                              VİRAL
+                            </div>
+                          </div>
+                          <h4 className="idea-item-title">{idea.title}</h4>
+                          <p className="idea-desc">{idea.desc}</p>
+                          <button onClick={() => handleIdeaDetail(idea)} className="btn-detail-view">
+                            Senaryoyu Gör <ArrowRight style={{ width: 14, height: 14 }} />
+                          </button>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <div className="expert-insight-box glow-gold">
+                      <div className="insight-header">
+                        <Lightbulb className="w-5 h-5 text-gold" />
+                        <span>Ufuk Açıcı Bilgi</span>
+                      </div>
+                      <p className="insight-text">{getRecommendations().tip}</p>
+                    </div>
+                  </>
+                )}
+
+                <div className="panel-actions">
+                  <button onClick={resetPanel} className="btn-reset">
+                    <RefreshCw style={{ width: 18, height: 18 }} />
+                    Yeniden Başla
+                  </button>
+                  <a href="https://randevu.withnazligunes.com" className="btn-primary">
+                    Birlikte Kurgulayalım →
+                  </a>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && selectedIdea && (
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="detail-view-container"
+              >
+                <button onClick={() => setStep(3)} className="back-link">← Önerilere Dön</button>
+                
+                <div className="detail-card glass glow-gold">
+                  <div className="detail-header">
+                    <div className="viral-badge">
+                      <Zap style={{ width: 12, height: 12 }} />
+                      VİRAL SENARYO
+                    </div>
+                    <h3 className="detail-title">{selectedIdea.title}</h3>
+                    <p className="detail-desc">{selectedIdea.desc}</p>
+                  </div>
+
+                  <div className="scenario-box glass">
+                    <h4 className="scenario-heading">İçerik Akışı & Script</h4>
+                    <div className="scenario-steps">
+                      {selectedIdea.scenario.split('\n').map((line, i) => (
+                        <div key={i} className="scenario-line">
+                          <span className="line-dot" />
+                          <p>{line.trim()}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="detail-actions">
+                    <p className="detail-hint">Bu senaryoyu kendi tarzına göre uyarlayarak hemen çekime başlayabilirsin!</p>
+                    <a href="https://randevu.withnazligunes.com" className="btn-primary glow-gold">
+                      Nazlı ile Birlikte Çekelim
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </section>
   );
 }
