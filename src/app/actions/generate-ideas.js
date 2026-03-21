@@ -44,9 +44,13 @@ export async function generateIdeasAction(niche, style) {
     const response = await result.response;
     const text = response.text();
     
-    // JSON temizleme (bazı modeller markdown bloğu içinde döndürebiliyor)
-    const jsonString = text.replace(/```json|```/g, "").trim();
-    return JSON.parse(jsonString);
+    // JSON temizleme (bazı modeller markdown bloğu dışında yazılar veya açıklamalar döndürebiliyor)
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) {
+      console.error("AI Response Text:", text);
+      throw new Error("Geçerli bir JSON formatı bulunamadı.");
+    }
+    return JSON.parse(match[0]);
   } catch (error) {
     console.error("AI Generation Error:", error);
     throw new Error("Fikirler oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
