@@ -2,7 +2,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle } from "lucide-react";
+import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Home } from "lucide-react";
 import { updateUser } from "@/app/actions/update-user";
 
 export default function ProfilePage() {
@@ -58,6 +58,14 @@ export default function ProfilePage() {
   return (
     <div className="profile-page h-full">
       <div className="profile-container">
+        {/* Back Navigation */}
+        <div className="profile-nav-top">
+          <a href="/" className="profile-back-link glass">
+            <ArrowLeft size={16} />
+            <span>Ana Sayfaya Dön</span>
+          </a>
+        </div>
+
         {/* Header */}
         <div className="profile-header glass glow-gold">
           <div className="profile-avatar-wrapper">
