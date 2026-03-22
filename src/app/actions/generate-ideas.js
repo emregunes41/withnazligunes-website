@@ -4,12 +4,22 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateIdeasAction(niche, style) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  let apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  
   if (!apiKey) {
-    const geminiKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes("GEMINI"));
-    const keysCount = Object.keys(process.env).length;
-    console.error("GEMINI_API_KEY is missing. Gemini-related keys found:", geminiKeys);
-    return { error: `ERR_MISSING_KEY: GEMINI_API_KEY bulunamadı. Toplam Key: ${keysCount}. Bulunan benzerler: [${geminiKeys.join(", ") || "YOK"}]. Lütfen Vercel'deki ismi kontrol et.` };
+    // Deep search by value prefix
+    const foundKey = Object.keys(process.env).find(k => 
+      process.env[k] && typeof process.env[k] === 'string' && process.env[k].startsWith("AIza")
+    );
+    
+    if (foundKey) {
+      console.log(`Found matching key by value prefix: ${foundKey}`);
+      apiKey = process.env[foundKey];
+    } else {
+      const geminiKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes("GEMINI"));
+      const keysCount = Object.keys(process.env).length;
+      return { error: `ERR_DEEP_FAIL: 'AIza' ile başlayan değer bulunamadı. Toplam Key: ${keysCount}. Benzer İsimler: [${geminiKeys.join(", ") || "YOK"}]. v1.0.5` };
+    }
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
