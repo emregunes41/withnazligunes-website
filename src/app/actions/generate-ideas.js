@@ -21,28 +21,11 @@ export async function generateIdeasAction(niche, style) {
     }
   });
 
-  const prompt = `
-    Sen bir sosyal medya stratejisti ve Nazlı Güneş'in (withnazligunes) üst düzey yapay zeka asistanısın. 
-    
-    Kullanıcı Verileri:
-    - Niş: ${niche}
-    - Tarz: ${style}
-
-    GÖREV:
-    Bu niş ve tarz için etkileşim potansiyeli en yüksek, KESİNLİKLE 3 ADET BİRBİRİNDEN FARKLI ve ÇOK DETAYLI içerik fikri üret. 
-
-    Her fikir için şu alanları doldur:
-    1. 'title': Merak uyandıran, tıklanma oranı yüksek bir başlık.
-    2. 'desc': Fikrin neden işe yarayacağını, hangi kitleye hitap ettiğini ve stratejik amacını açıklayan en az 4 cümlelik derinlemesine analiz.
-    3. 'scenario': Profesyonel çekim ve kurgu detayları. 3 adımda (Hook, Body, CTA) yazılmalı ve her adım yeni bir satırda olmalıdır.
-
-    Ayrıca:
-    - 'tip': Bu nişe özel, nadir bilinen ve vizyon katan profesyonel bir tüyo.
-
-    KURALLAR:
-    - Dil: Türkçe
-    - Yanıt sadece saf JSON objesi olmalıdır.
-    - JSON objesi şu yapıda olmalıdır:
+  const prompt = `GÖREV: ${niche} nişi için ${style} tarzında 3 adet viral içerik fikri üret.
+  
+  FORMAT (Sadece bu JSON objesini döndür):
+  {
+    "ideas": [
       {
         "ideas": [
           { "title": "...", "desc": "...", "scenario": "..." },
