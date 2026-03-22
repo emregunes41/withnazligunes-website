@@ -77,9 +77,7 @@ export default function ProfilePage() {
             <h1 className="profile-name">{session.user.name}</h1>
             <p className="profile-email">{session.user.email}</p>
             <div className="profile-badges">
-              <span className="profile-badge">
-                Premium Üye
-              </span>
+              {/* Premium badge removed as requested */}
             </div>
           </div>
           <button 
