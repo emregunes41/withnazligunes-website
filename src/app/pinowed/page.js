@@ -1,63 +1,124 @@
-import { prisma } from '@/lib/prisma';
-import BookingFlow from './BookingFlow';
-import { Calendar, FileSignature, CreditCard } from 'lucide-react';
+import { getPackages } from "./admin/core-actions";
+import BookingFlow from "./BookingFlow";
+import Image from "next/image";
 
-export default async function PinowedHome() {
-  const initialPackages = await prisma.photographyPackage.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: 'asc' }
-  });
+export const dynamic = 'force-dynamic';
+
+export default async function PinowedPage() {
+  const packages = await getPackages();
 
   return (
-    <div className="pinowed-theme">
-      {/* Navbar Minimal */}
-      <nav style={{ padding: '2rem', display: 'flex', justifyContent: 'center', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.03em' }}>
-          PINOWED.
-        </div>
-      </nav>
+    <main style={{ 
+      position: "relative", 
+      minHeight: "100vh", 
+      width: "100%", 
+      overflow: "hidden",
+      background: "#000" // Fallback black
+    }}>
+      
+      {/* Cinematic Background Video */}
+      <div style={{ 
+        position: "fixed", top: 0, left: 0, right: 0, bottom: 0, 
+        zIndex: 0, overflow: "hidden" 
+      }}>
+        <video 
+          autoPlay muted loop playsInline 
+          style={{ 
+            width: "100%", height: "100%", objectFit: "cover", 
+            opacity: 0.6, filter: "brightness(0.7) contrast(1.1)" 
+          }}
+        >
+          <source src="/pinowed/assets/hero.mp4" type="video/mp4" />
+        </video>
+        {/* Dark Overlay Gradient */}
+        <div style={{ 
+          position: "absolute", inset: 0, 
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)",
+          zIndex: 1 
+        }} />
+      </div>
 
-      {/* Hero Section */}
-      <section style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', padding: '6rem 1.5rem' }}>
-        <div>
+      {/* Hero Content Layer */}
+      <div style={{ 
+        position: "relative", zIndex: 10, 
+        display: "flex", flexDirection: "column", 
+        alignItems: "center", minHeight: "100vh", padding: "2rem" 
+      }}>
+        
+        {/* Logo Container */}
+        <div style={{ marginTop: "3rem", marginBottom: "4rem", textAlign: "center" }}>
           <div style={{ 
-            display: 'inline-flex', padding: '0.5rem 1rem', background: 'var(--primary-muted)', 
-            borderRadius: '99px', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '2rem' 
+            background: "rgba(255,255,255,0.05)", 
+            padding: "1rem 2rem", borderRadius: "1.5rem", 
+            backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)" 
           }}>
-            PROFESYONEL FOTOĞRAFÇILIK & REZERVASYON
+            <Image 
+              src="/pinowed/assets/logo.jpg" 
+              alt="Pinowed Logo" 
+              width={180} 
+              height={60} 
+              style={{ objectFit: "contain", borderRadius: "0.5rem" }}
+            />
           </div>
-          <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-            En saf anları <br/> ölümsüzleştiriyoruz.
+        </div>
+
+        {/* Global Floating Header Info */}
+        <div style={{ textAlign: "center", marginBottom: "3rem", color: "#fff" }}>
+          <h1 style={{ fontSize: "3.5rem", fontWeight: 900, letterSpacing: "-0.04em", marginBottom: "1rem", textShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+            Anılarını Ölümsüzleştir
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 3rem', lineHeight: 1.7 }}>
-            Hayalinizdeki konsepti seçin, tarihinizi ayırtın ve sözleşmenizi saniyeler içinde online onaylayıp ödemenizi tamamlayın.
+          <p style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.7)", maxWidth: "600px", margin: "0 auto" }}>
+            Profesyonel dokunuşlarla en özel günlerini birer sanat eserine dönüştürüyoruz.
           </p>
         </div>
-      </section>
 
-      {/* Booking Form Interface (Dynamic Client Component) */}
-      <section style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1.5rem 6rem' }}>
+        {/* The Booking Flow Container (Glassmorphism Layer) */}
         <div style={{ 
-          background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '2rem', 
-          padding: '3rem 2rem', boxShadow: '0 20px 40px rgba(0,0,0,0.02)'
+          width: "100%", maxWidth: "1200px", 
+          background: "rgba(255,255,255,0.03)", 
+          backdropFilter: "blur(25px) saturate(180%)", 
+          WebkitBackdropFilter: "blur(25px) saturate(180%)", 
+          borderRadius: "3rem", 
+          border: "1px solid rgba(255,255,255,0.12)", 
+          padding: "3rem",
+          boxShadow: "0 40px 100px -20px rgba(0,0,0,0.5)",
+          marginBottom: "5rem"
         }}>
-          <BookingFlow initialPackages={initialPackages} />
+          <BookingFlow initialPackages={packages} />
         </div>
-      </section>
 
-      {/* Feature Highlights Minimal */}
-      <section style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem 1.5rem 6rem', display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          <Calendar size={20} /> Yüzde Yüz Dijital Rezervasyon
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          <FileSignature size={20} /> E-Sözleşme Onayı
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          <CreditCard size={20} /> Güvenli Kredi Kartı Ödemesi
-        </div>
-      </section>
+        {/* Footer Info */}
+        <footer style={{ padding: "4rem 2rem", textAlign: "center", color: "rgba(255,255,255,0.4)", fontSize: "0.85rem" }}>
+          <p>© 2026 PINOWED Photography. Tüm hakları saklıdır.</p>
+        </footer>
 
-    </div>
+      </div>
+
+      {/* Custom Styles for Glassmorphism effects */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        :root {
+          --primary: #fff;
+          --primary-muted: rgba(255,255,255,0.1);
+          --bg: transparent;
+          --bg-card: rgba(255,255,255,0.05);
+          --border: rgba(255,255,255,0.15);
+          --text: #fff;
+          --text-muted: rgba(255,255,255,0.5);
+        }
+        body { background: #000; color: #fff; }
+        .glass-hover:hover {
+          background: rgba(255,255,255,0.08) !important;
+          border-color: rgba(255,255,255,0.3) !important;
+          transform: translateY(-5px);
+        }
+        input, select, textarea {
+          background: rgba(255,255,255,0.05) !important;
+          color: #fff !important;
+          border-color: rgba(255,255,255,0.2) !important;
+        }
+        input::placeholder { color: rgba(255,255,255,0.3) !important; }
+      `}} />
+
+    </main>
   );
 }

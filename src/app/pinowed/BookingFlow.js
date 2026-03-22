@@ -176,24 +176,26 @@ export default function BookingFlow({ initialPackages }) {
                     key={pkg.id} 
                     onClick={() => togglePackage(pkg)}
                     style={{ 
-                      background: 'var(--bg)', border: isSelected ? '3px solid var(--primary)' : '1px solid var(--border)', 
+                      background: isSelected ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)', 
+                      border: isSelected ? '3px solid #fff' : '1px solid rgba(255,255,255,0.1)', 
                       padding: '2rem', borderRadius: '1.5rem', cursor: 'pointer', transition: 'all 0.2s',
-                      position: "relative"
+                      position: "relative",
+                      color: "#fff"
                     }}
                     className="glass-hover"
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                       <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>{pkg.name}</h3>
-                      {isSelected && <div style={{ background: "var(--primary)", color: "#fff", padding: "0.4rem", borderRadius: "50%" }}><Check size={16} /></div>}
+                      {isSelected && <div style={{ background: "#fff", color: "#000", padding: "0.4rem", borderRadius: "50%" }}><Check size={16} /></div>}
                     </div>
                     <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, background: "var(--primary-muted)", color: "var(--primary)", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.price} TL</span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.timeType === "SLOT" ? "2 Saat" : "Tüm Gün"}</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.price} TL</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.timeType === "SLOT" ? "2 Saat" : "Tüm Gün"}</span>
                     </div>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', minHeight: "3rem" }}>{pkg.description}</p>
+                    <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', minHeight: "3rem" }}>{pkg.description}</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                       {pkg.features.slice(0, 3).map((f, i) => (
-                        <span key={i} style={{ fontSize: "0.7rem", background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.4rem" }}>{f}</span>
+                        <span key={i} style={{ fontSize: "0.7rem", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)", padding: "0.2rem 0.5rem", borderRadius: "0.4rem" }}>{f}</span>
                       ))}
                     </div>
                   </div>
@@ -207,18 +209,20 @@ export default function BookingFlow({ initialPackages }) {
                 initial={{ y: 100 }} animate={{ y: 0 }}
                 style={{ 
                   position: "fixed", bottom: "2rem", left: "50%", transform: "translateX(-50%)",
-                  background: "var(--bg)", border: "1px solid var(--border)", padding: "1rem 2rem",
-                  borderRadius: "2rem", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
-                  display: "flex", alignItems: "center", gap: "2rem", zIndex: 100, width: "90%", maxWidth: "600px"
+                  background: "rgba(255,255,255,0.1)", backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255,255,255,0.2)", padding: "1rem 2rem",
+                  borderRadius: "2rem", boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                  display: "flex", alignItems: "center", gap: "2rem", zIndex: 100, width: "90%", maxWidth: "600px",
+                  color: "#fff"
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--primary)" }}>SEPETİNİZ ({selectedPackages.length} Paket)</div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>SEPETİNİZ ({selectedPackages.length} Paket)</div>
                   <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>TOPLAM: {getPackagesPrice()} TL</div>
                 </div>
                 <button 
                   onClick={() => setStep(2)}
-                  style={{ background: "var(--primary)", color: "#fff", border: "none", padding: "0.8rem 1.5rem", borderRadius: "1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}
+                  style={{ background: "#fff", color: "#000", border: "none", padding: "0.8rem 1.5rem", borderRadius: "1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}
                 >
                   Devam Et <ChevronRight size={18} />
                 </button>
