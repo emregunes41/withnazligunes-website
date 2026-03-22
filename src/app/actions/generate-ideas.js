@@ -1,6 +1,6 @@
 "use server";
 
-// Re-deployment trigger with the new GEMINI_API_KEY.
+// Final deployment trigger for GEMINI_API_KEY synchronization.
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateIdeasAction(niche, style) {
