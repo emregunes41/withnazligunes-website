@@ -57,15 +57,24 @@ export async function generateIdeasAction(niche, style) {
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    let text = response.text();
     
-    // JSON bloğunu temizleme
+    // Markdown code blocks temizleme
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return { error: "PARSE_ERROR" };
+      console.error("No JSON found in response:", text);
+      return { error: `PARSE_ERROR_NO_JSON: ${text.slice(0, 50)}...` };
     }
 
-    const data = JSON.parse(jsonMatch[0]);
+    let data;
+    try {
+      data = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      console.error("JSON Parse Error:", parseErr);
+      return { error: `PARSE_ERROR_INVALID: ${text.slice(0, 50)}...` };
+    }
 
     // Fikir sayısını doğrula, LLM bazen eksik verebilir
     if (!data.ideas || data.ideas.length === 0) {
