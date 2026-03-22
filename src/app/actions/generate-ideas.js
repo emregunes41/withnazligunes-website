@@ -62,18 +62,20 @@ export async function generateIdeasAction(niche, style) {
     // Markdown code blocks temizleme
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
     
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("No JSON found in response:", text);
-      return { error: `PARSE_ERROR_NO_JSON: ${text.slice(0, 50)}...` };
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+      const info = `Len: ${text.length}, First: ${firstBrace}, Last: ${lastBrace}`;
+      return { error: `PARSE_ERROR_NO_JSON: ${info}. Başlangıç: ${text.slice(0, 50)}...` };
     }
 
+    const jsonString = text.substring(firstBrace, lastBrace + 1);
     let data;
     try {
-      data = JSON.parse(jsonMatch[0]);
+      data = JSON.parse(jsonString);
     } catch (parseErr) {
-      console.error("JSON Parse Error:", parseErr);
-      return { error: `PARSE_ERROR_INVALID: ${text.slice(0, 50)}...` };
+      return { error: `PARSE_ERROR_INVALID: ${jsonString.slice(0, 50)}...` };
     }
 
     // Fikir sayısını doğrula, LLM bazen eksik verebilir
