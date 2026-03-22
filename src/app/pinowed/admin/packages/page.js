@@ -74,11 +74,19 @@ export default function PackagesPage() {
             >
               <Trash2 size={18} />
             </button>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
               <PackageIcon size={20} color="var(--primary)" />
               <h3 style={{ fontWeight: 700, fontSize: "1.1rem" }}>{pkg.name}</h3>
             </div>
-            <div style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.5rem" }}>{pkg.price}</div>
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+              <span style={{ fontSize: "0.7rem", background: "var(--primary-muted)", color: "var(--primary)", padding: "0.2rem 0.5rem", borderRadius: "0.4rem", fontWeight: 700 }}>
+                {pkg.category}
+              </span>
+              <span style={{ fontSize: "0.7rem", background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.4rem", fontWeight: 600 }}>
+                {pkg.timeType} (K: {pkg.maxCapacity})
+              </span>
+            </div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "0.5rem" }}>{pkg.price} TL</div>
             <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginBottom: "1rem" }}>{pkg.description}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               {pkg.features.map((f, i) => (
