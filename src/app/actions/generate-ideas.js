@@ -10,33 +10,46 @@ export async function generateIdeasAction(niche, style) {
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash",
+    generationConfig: {
+      temperature: 1.0,
+      topP: 0.95,
+      topK: 40,
+      maxOutputTokens: 2048,
+    }
+  });
 
   const prompt = `
-    Sen bir sosyal medya stratejisti ve Nazlı Güneş'in (withnazligunes) yapay zeka asistanısın. 
-    Kullanıcının verileri:
-    Niş: ${niche}
-    Tarz: ${style}
-    Görevin:
-    1. Bu niş ve tarza uygun, etkileşim (viral) potansiyeli yüksek, KESİNLİKLE VE TAM OLARAK 3 ADET ÇOK DETAYLI içerik fikri üret. Sadece 1 tane üretme, mutlaka 3 tane farklı fikir ver.
-    2. Her fikir için:
-       - 'title': Çarpıcı ve dikkat çekici bir başlık.
-       - 'desc': Stratejik ve ufuk açıcı, vizyon katan çok detaylı bir açıklama (neden işe yarayacağı, hangi psikolojik tetikleyicileri kullandığı vb. en az 3-4 cümle).
-       - 'scenario': Çekim açıları, kamera hareketleri ve kurgu fikirleri içeren çok detaylı ve profesyonel 3 adımlı bir senaryo (Hook, Body, CTA formatında, her adım ayrı satırda).
-    3. 1 adet 'tip': Daha fazla etkileşim için ufuk açıcı, nişe özel, nadir bilinen bir profesyonel ipucu.
-
-    DİL: TÜRKÇE
-    FORMAT: Sadece saf JSON objesi döndür. Markdown veya ek açıklama ekleme.
+    Sen bir sosyal medya stratejisti ve Nazlı Güneş'in (withnazligunes) üst düzey yapay zeka asistanısın. 
     
-    JSON Yapısı:
-    {
-      "ideas": [
-        { "title": "...", "desc": "...", "scenario": "..." },
-        { "title": "...", "desc": "...", "scenario": "..." },
-        { "title": "...", "desc": "...", "scenario": "..." }
-      ],
-      "tip": "..."
-    }
+    Kullanıcı Verileri:
+    - Niş: ${niche}
+    - Tarz: ${style}
+
+    GÖREV:
+    Bu niş ve tarz için etkileşim potansiyeli en yüksek, KESİNLİKLE 3 ADET BİRBİRİNDEN FARKLI ve ÇOK DETAYLI içerik fikri üret. 
+
+    Her fikir için şu alanları doldur:
+    1. 'title': Merak uyandıran, tıklanma oranı yüksek bir başlık.
+    2. 'desc': Fikrin neden işe yarayacağını, hangi kitleye hitap ettiğini ve stratejik amacını açıklayan en az 4 cümlelik derinlemesine analiz.
+    3. 'scenario': Profesyonel çekim ve kurgu detayları. 3 adımda (Hook, Body, CTA) yazılmalı ve her adım yeni bir satırda olmalıdır.
+
+    Ayrıca:
+    - 'tip': Bu nişe özel, nadir bilinen ve vizyon katan profesyonel bir tüyo.
+
+    KURALLAR:
+    - Dil: Türkçe
+    - Yanıt sadece saf JSON objesi olmalıdır.
+    - JSON objesi şu yapıda olmalıdır:
+      {
+        "ideas": [
+          { "title": "...", "desc": "...", "scenario": "..." },
+          { "title": "...", "desc": "...", "scenario": "..." },
+          { "title": "...", "desc": "...", "scenario": "..." }
+        ],
+        "tip": "..."
+      }
   `;
 
   try {
@@ -44,15 +57,22 @@ export async function generateIdeasAction(niche, style) {
     const response = await result.response;
     const text = response.text();
     
-    // JSON temizleme (bazı modeller markdown bloğu dışında yazılar veya açıklamalar döndürebiliyor)
-    const match = text.match(/\{[\s\S]*\}/);
-    if (!match) {
-      console.error("AI Response Text:", text);
-      throw new Error("Geçerli bir JSON formatı bulunamadı.");
+    // JSON bloğunu temizleme
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Geçerli bir JSON formatı üretilemedi.");
     }
-    return JSON.parse(match[0]);
+
+    const data = JSON.parse(jsonMatch[0]);
+
+    // Fikir sayısını doğrula, LLM bazen eksik verebilir
+    if (!data.ideas || data.ideas.length < 3) {
+      console.warn("AI fewer than 3 ideas, returning as is or retrying internally could be added here.");
+    }
+
+    return data;
   } catch (error) {
-    console.error("AI Generation Error:", error);
-    throw new Error("Fikirler oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+    console.error("Gemini API Error:", error);
+    throw new Error("İçerik fikirleri oluşturulurken bir teknik sorun oluştu.");
   }
 }
