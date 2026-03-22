@@ -821,14 +821,16 @@ function CreatorPanelSection() {
     setAiError(null);
     try {
       const res = await generateIdeasAction(currentNicheLabel, styleId);
-      if (res && res.ideas && res.ideas.length > 0) {
+      if (res && res.error) {
+        setAiError(res.error);
+      } else if (res && res.ideas && res.ideas.length > 0) {
         setAiRecommendations(res);
       } else {
-        throw new Error("Boş sonuç döndü");
+        setAiError("ERR_EMPTY_RESULT: Beklenmedik boş sonuç.");
       }
     } catch (err) {
-      console.error("AI Error:", err);
-      setAiError(err.message || "Şu an standart strateji rehberini kullanıyoruz.");
+      console.error("AI Action Fatal Error:", err);
+      setAiError("ERR_ACTION_CRASH: Sunucu iletişimi kesildi.");
     } finally {
       setIsLoading(false);
     }

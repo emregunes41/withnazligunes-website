@@ -4,9 +4,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateIdeasAction(niche, style) {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error("GEMINI_API_KEY is missing");
-    throw new Error("ERR_MISSING_KEY: Vercel üzerinde GEMINI_API_KEY bulunamadı.");
+    return { error: "ERR_MISSING_KEY: Vercel üzerinde GEMINI_API_KEY bulunamadı." };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -50,6 +51,7 @@ export async function generateIdeasAction(niche, style) {
         ],
         "tip": "..."
       }
+    - JSON bloğunu \`\`\`json ve \`\`\` arasına alabilirsin.
   `;
 
   try {
@@ -60,20 +62,20 @@ export async function generateIdeasAction(niche, style) {
     // JSON bloğunu temizleme
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("Geçerli bir JSON formatı üretilemedi.");
+      return { error: "ERR_PARSE_FAIL: Geçerli bir JSON formatı üretilemedi." };
     }
 
     const data = JSON.parse(jsonMatch[0]);
 
     // Fikir sayısını doğrula, LLM bazen eksik verebilir
-    if (!data.ideas || data.ideas.length < 3) {
-      console.warn("AI fewer than 3 ideas, returning as is or retrying internally could be added here.");
+    if (!data.ideas || data.ideas.length === 0) {
+      return { error: "ERR_EMPTY_RESULT: AI boş sonuç döndü." };
     }
 
     return data;
   } catch (error) {
     console.error("Gemini API Error details:", error);
     const msg = error.message || "Unknown Error";
-    throw new Error(`ERR_API_FAIL: ${msg}`);
+    return { error: `ERR_API_FAIL: ${msg}` };
   }
 }
