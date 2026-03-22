@@ -746,7 +746,7 @@ export default function Home() {
       <section className="section" style={{ textAlign: "center", position: 'relative' }}>
         <motion.div 
           className="floating-img-container" 
-          style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}
+          style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         >

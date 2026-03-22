@@ -23,6 +23,9 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100vw;
+  max-width: 100%;
 }
 
 body {
@@ -32,6 +35,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  width: 100vw;
+  max-width: 100%;
 }
 
 /* Scrollbar */
@@ -1079,4 +1084,66 @@ body {
   0% { opacity: 0.7; }
   50% { opacity: 1; }
   100% { opacity: 0.7; }
+}
+
+/* Mobile Optimization Overrides */
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 1.25rem;
+  }
+  .hero {
+    padding: 6rem 1.25rem 3rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 8vw, 3rem);
+    margin-bottom: 1rem;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  .creator-panel-card {
+    padding: 2rem 1.25rem;
+    border-radius: 1.5rem;
+  }
+  .detail-card {
+    padding: 1.5rem;
+  }
+  .service-card, .coming-soon-card {
+    padding: 1.5rem;
+  }
+  .ideas-container {
+    gap: 1rem;
+  }
+  .idea-item {
+    padding: 1.25rem;
+  }
+  .step-header-with-badge {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .results-badge-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .results-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .navbar-inner {
+    padding: 0 1.25rem;
+  }
+  .btn-primary, .btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+  .panel-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  /* Remove fixed grids for niches on very small screens */
+  .niche-grid, .style-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
 }
