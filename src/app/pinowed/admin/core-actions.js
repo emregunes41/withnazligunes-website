@@ -44,22 +44,49 @@ export async function deletePackage(id) {
 export async function getReservations() {
   return await prisma.reservation.findMany({
     include: { package: true },
-    orderBy: { eventDate: 'desc' }
+    orderBy: { createdAt: 'desc' }
   });
+}
+
+export async function savePendingReservation(data) {
+  try {
+    const reservation = await prisma.reservation.create({
+      data: {
+        brideName: data.brideName,
+        bridePhone: data.bridePhone,
+        brideEmail: data.brideEmail,
+        groomName: data.groomName,
+        groomPhone: data.groomPhone,
+        groomEmail: data.groomEmail,
+        eventDate: new Date(data.date),
+        eventTime: data.time,
+        packageId: data.packageId,
+        notes: data.notes,
+        totalAmount: data.totalAmount,
+        paidAmount: data.paidAmount,
+        status: "PENDING",
+        paymentStatus: "UNPAID"
+      }
+    });
+    return { success: true, id: reservation.id };
+  } catch (error) {
+    console.error("Save Reservation Error:", error);
+    return { error: error.message };
+  }
 }
 
 export async function createManualReservation(data) {
   try {
-    const { clientName, clientPhone, clientEmail, eventDate, packageId, notes } = data;
+    const { brideName, bridePhone, brideEmail, groomName, groomPhone, groomEmail, eventDate, eventTime, packageId, notes } = data;
     await prisma.reservation.create({
       data: {
-        clientName,
-        clientPhone,
-        clientEmail,
+        brideName, bridePhone, brideEmail,
+        groomName, groomPhone, groomEmail,
         eventDate: new Date(eventDate),
+        eventTime,
         packageId,
         notes,
-        status: "CONFIRMED", // Manual entries typically skip pending
+        status: "CONFIRMED", 
         paymentStatus: "UNPAID"
       }
     });

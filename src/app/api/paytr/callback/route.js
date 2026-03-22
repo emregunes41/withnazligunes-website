@@ -32,12 +32,12 @@ export async function POST(req) {
 
     if (status === "success") {
       // Find the reservation associated with this merchant_oid
-      // We assume merchant_oid is the reservation ID
       await prisma.reservation.update({
         where: { id: merchant_oid },
         data: {
           status: "CONFIRMED",
-          paymentStatus: "PAID"
+          paymentStatus: "PAID",
+          // The paidAmount was set during pending save, but we could confirm it here
         }
       });
       

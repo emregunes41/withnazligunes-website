@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, User, Phone, Mail, ChevronRight, CreditCard, Clock, Info } from "lucide-react";
+import { savePendingReservation } from "./admin/core-actions";
 
 export default function BookingFlow({ initialPackages }) {
   const [step, setStep] = useState(1); // 1: Package, 2: Details/Contract, 3: Payment Type, 4: iFrame
@@ -36,10 +37,21 @@ export default function BookingFlow({ initialPackages }) {
     setIsLoading(true);
 
     try {
+      // 1. Save Pending Reservation to DB
+      const saveRes = await savePendingReservation({
+        ...formData,
+        packageId: selectedPackage.id,
+        totalAmount: selectedPackage.price,
+        paidAmount: `${finalPrice} TL`
+      });
+
+      if (!saveRes.success) throw new Error(saveRes.error);
+
+      // 2. Get PayTR Token using the Reservation ID
       const res = await fetch("/api/paytr/checkout", {
         method: "POST",
         body: JSON.stringify({
-          merchant_oid: "PNW_" + Date.now(),
+          merchant_oid: saveRes.id, // Use real ID
           email: formData.brideEmail,
           payment_amount: finalPrice * 100, // in kurus
           user_name: `${formData.brideName} & ${formData.groomName}`,
