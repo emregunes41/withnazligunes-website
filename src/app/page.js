@@ -828,7 +828,7 @@ function CreatorPanelSection() {
       }
     } catch (err) {
       console.error("AI Error:", err);
-      setAiError("Şu an standart strateji rehberini kullanıyoruz.");
+      setAiError(err.message || "Şu an standart strateji rehberini kullanıyoruz.");
     } finally {
       setIsLoading(false);
     }

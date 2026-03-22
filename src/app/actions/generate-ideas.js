@@ -4,10 +4,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateIdeasAction(niche, style) {
-  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error("GEMINI_API_KEY is missing");
-    throw new Error("AI Configuration is missing. Please add GEMINI_API_KEY to environment variables.");
+    throw new Error("ERR_MISSING_KEY: Vercel üzerinde GEMINI_API_KEY bulunamadı.");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -73,7 +72,8 @@ export async function generateIdeasAction(niche, style) {
 
     return data;
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error("İçerik fikirleri oluşturulurken bir teknik sorun oluştu.");
+    console.error("Gemini API Error details:", error);
+    const msg = error.message || "Unknown Error";
+    throw new Error(`ERR_API_FAIL: ${msg}`);
   }
 }
