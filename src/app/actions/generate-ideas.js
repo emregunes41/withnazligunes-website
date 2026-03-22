@@ -76,6 +76,6 @@ export async function generateIdeasAction(niche, style) {
   } catch (error) {
     console.error("Gemini API Error details:", error);
     const apiErrorMsg = error.message || "Bilinmeyen API Hatası";
-    return { error: `API_ERROR: ${apiErrorMsg.slice(0, 100)}` };
+    return { error: `API_ERROR: ${apiErrorMsg.slice(0, 500)}` };
   }
 }
