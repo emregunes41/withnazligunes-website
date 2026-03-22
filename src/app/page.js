@@ -743,7 +743,7 @@ export default function Home() {
 
       {/* CTA BANNER */}
       <hr className="section-divider" />
-      <section className="section" style={{ textAlign: "center", position: 'relative' }}>
+      <section className="section" style={{ textAlign: "center", position: 'relative', overflow: 'hidden' }}>
         <motion.div 
           className="floating-img-container" 
           style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}

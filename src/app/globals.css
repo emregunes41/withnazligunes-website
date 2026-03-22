@@ -35,6 +35,8 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* Scrollbar */
@@ -1094,52 +1096,52 @@ body {
     padding: 5rem 1rem 3rem;
   }
   
-  /* Typography Scale Down */
+  /* Typography Scale Down (but keeping it readable) */
   .hero h1 {
-    font-size: clamp(2rem, 8vw, 2.5rem);
+    font-size: clamp(2.25rem, 9vw, 3rem);
     margin-bottom: 0.75rem;
   }
   .hero-subtitle {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     margin-bottom: 2rem;
   }
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
   .section-subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin-bottom: 2rem;
   }
   
   /* Frame & Card Compaction */
   .creator-panel-card {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1.25rem;
     border-radius: 1.25rem;
   }
   .detail-card {
-    padding: 1.25rem;
+    padding: 1.5rem;
     border-radius: 1.25rem;
   }
   .service-card, .coming-soon-card {
-    padding: 1.25rem;
+    padding: 1.5rem;
   }
   
   /* Feature Elements */
   .ideas-container {
-    gap: 1rem;
+    gap: 1.25rem;
   }
   .idea-item {
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 1rem;
   }
   .idea-item-title {
-    font-size: 1rem;
+    font-size: 1.15rem;
   }
   .idea-desc {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
   }
   .expert-insight-box {
-    padding: 1rem;
+    padding: 1.25rem;
     margin-bottom: 1.5rem;
   }
   
@@ -1151,7 +1153,7 @@ body {
     margin-bottom: 1.5rem;
   }
   .step-heading {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     margin-bottom: 1rem;
   }
   .results-badge-group {
@@ -1159,24 +1161,24 @@ body {
     justify-content: flex-start;
   }
   .results-heading {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }
   
   /* Nav & Footer */
   .navbar-inner {
-    padding: 0 1rem;
+    padding: 0 1.25rem;
   }
   .footer {
-    padding: 1.5rem 1rem;
+    padding: 2rem 1.25rem;
   }
   
   /* Buttons */
   .btn-primary, .btn-outline {
     width: 100%;
     justify-content: center;
-    padding: 0.75rem 1.25rem;
-    font-size: 0.9rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
   }
   .panel-actions {
     flex-direction: column;
