@@ -35,7 +35,7 @@ export const authOptions = {
           throw new Error("Lütfen email ve şifrenizi girin.");
         }
 
-        const user = await prisma.member.findUnique({
+        const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 

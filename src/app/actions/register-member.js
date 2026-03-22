@@ -11,7 +11,7 @@ export async function registerMember(formData) {
   }
 
   try {
-    const existingUser = await prisma.member.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -21,7 +21,7 @@ export async function registerMember(formData) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const member = await prisma.member.create({
+    const user = await prisma.user.create({
       data: {
         name,
         email,
