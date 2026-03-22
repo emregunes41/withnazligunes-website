@@ -6,9 +6,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export async function generateIdeasAction(niche, style) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    const keys = Object.keys(process.env).filter(k => !k.includes("TOKEN") && !k.includes("KEY") && !k.includes("SECRET"));
-    console.error("GEMINI_API_KEY is missing. Available non-sensitive keys:", keys);
-    return { error: `ERR_MISSING_KEY: Vercel üzerinde GEMINI_API_KEY bulunamadı. Mevcut KEY sayısı: ${Object.keys(process.env).length}. Lütfen Vercel'de 'GEMINI_API_KEY' ismini kontrol et.` };
+    const geminiKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes("GEMINI"));
+    const keysCount = Object.keys(process.env).length;
+    console.error("GEMINI_API_KEY is missing. Gemini-related keys found:", geminiKeys);
+    return { error: `ERR_MISSING_KEY: GEMINI_API_KEY bulunamadı. Toplam Key: ${keysCount}. Bulunan benzerler: [${geminiKeys.join(", ") || "YOK"}]. Lütfen Vercel'deki ismi kontrol et.` };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
