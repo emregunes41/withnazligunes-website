@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, CalendarDays, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, CalendarDays, LogOut, Users } from "lucide-react";
 import { logoutAdmin } from "./actions";
 
 export default function AdminLayout({ children }) {
@@ -17,6 +17,7 @@ export default function AdminLayout({ children }) {
     { name: "Dashboard", href: "/pinowed/admin/dashboard", icon: LayoutDashboard },
     { name: "Paketler", href: "/pinowed/admin/packages", icon: Package },
     { name: "Rezervasyonlar", href: "/pinowed/admin/reservations", icon: CalendarDays },
+    { name: "Üyeler", href: "/pinowed/admin/members", icon: Users },
   ];
 
   return (
