@@ -22,8 +22,31 @@ export async function createPackage(data) {
         category: category || "STANDARD",
         timeType: timeType || "FULL_DAY",
         maxCapacity: parseInt(maxCapacity) || 1,
-        features: features.split(',').map(f => f.trim()).filter(f => f !== ""),
-        addons: addons || [], // Expected as [{ title, price }]
+        features: Array.isArray(features) ? features : features.split(',').map(f => f.trim()).filter(f => f !== ""),
+        addons: addons || [],
+      }
+    });
+    revalidatePath('/pinowed/admin/packages');
+    return { success: true };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+export async function updatePackage(id, data) {
+  try {
+    const { name, description, price, features, category, timeType, maxCapacity, addons } = data;
+    await prisma.photographyPackage.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        price,
+        category,
+        timeType,
+        maxCapacity: parseInt(maxCapacity),
+        features: Array.isArray(features) ? features : features.split(',').map(f => f.trim()).filter(f => f !== ""),
+        addons
       }
     });
     revalidatePath('/pinowed/admin/packages');

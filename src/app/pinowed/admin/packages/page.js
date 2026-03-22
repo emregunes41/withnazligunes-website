@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Package as PackageIcon } from "lucide-react";
-import { getPackages, createPackage, deletePackage } from "../core-actions";
+import { Plus, Trash2, Edit2, Package as PackageIcon } from "lucide-react";
+import { getPackages, createPackage, updatePackage, deletePackage } from "../core-actions";
 
 export default function PackagesPage() {
   const [packages, setPackages] = useState([]);
@@ -12,6 +12,7 @@ export default function PackagesPage() {
     category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     loadPackages();
@@ -25,9 +26,13 @@ export default function PackagesPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const res = await createPackage(formData);
+    const res = editingId 
+      ? await updatePackage(editingId, formData)
+      : await createPackage(formData);
+
     if (res.success) {
       setIsModalOpen(false);
+      setEditingId(null);
       setFormData({ 
         name: "", description: "", price: "", features: "", 
         category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
@@ -35,6 +40,30 @@ export default function PackagesPage() {
       loadPackages();
     }
     setIsLoading(false);
+  };
+
+  const startEdit = (pkg) => {
+    setEditingId(pkg.id);
+    setFormData({
+      name: pkg.name,
+      description: pkg.description,
+      price: pkg.price,
+      features: pkg.features.join(", "),
+      category: pkg.category,
+      timeType: pkg.timeType,
+      maxCapacity: pkg.maxCapacity.toString(),
+      addons: pkg.addons || []
+    });
+    setIsModalOpen(true);
+  };
+
+  const openNewPackageModal = () => {
+    setEditingId(null);
+    setFormData({ 
+      name: "", description: "", price: "", features: "", 
+      category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
+    });
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (id) => {
@@ -52,7 +81,7 @@ export default function PackagesPage() {
           <p style={{ color: "var(--text-muted)" }}>Sitede görünen fotoğrafçılık paketlerini buradan düzenleyebilirsin.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={openNewPackageModal}
           style={{ 
             background: "var(--primary)", color: "#fff", padding: "0.75rem 1.5rem", 
             borderRadius: "0.75rem", border: "none", fontWeight: 600, cursor: "pointer",
@@ -69,12 +98,20 @@ export default function PackagesPage() {
             background: "var(--bg)", border: "1px solid var(--border)", 
             padding: "1.5rem", borderRadius: "1rem", position: "relative" 
           }}>
-            <button 
-              onClick={() => handleDelete(pkg.id)}
-              style={{ position: "absolute", top: "1rem", right: "1rem", background: "transparent", border: "none", color: "#EF4444", cursor: "pointer" }}
-            >
-              <Trash2 size={18} />
-            </button>
+            <div style={{ position: "absolute", top: "1rem", right: "1rem", display: "flex", gap: "0.5rem" }}>
+              <button 
+                onClick={() => startEdit(pkg)}
+                style={{ background: "transparent", border: "none", color: "var(--primary)", cursor: "pointer" }}
+              >
+                <Edit2 size={18} />
+              </button>
+              <button 
+                onClick={() => handleDelete(pkg.id)}
+                style={{ background: "transparent", border: "none", color: "#EF4444", cursor: "pointer" }}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
               <PackageIcon size={20} color="var(--primary)" />
               <h3 style={{ fontWeight: 700, fontSize: "1.1rem" }}>{pkg.name}</h3>
@@ -107,7 +144,7 @@ export default function PackagesPage() {
           background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 
         }}>
           <div style={{ background: "var(--bg)", padding: "2.5rem", borderRadius: "1.5rem", width: "100%", maxWidth: "500px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
-            <h2 style={{ marginBottom: "1.5rem", fontWeight: 800 }}>Yeni Paket Oluştur</h2>
+            <h2 style={{ marginBottom: "1.5rem", fontWeight: 800 }}>{editingId ? "Paketi Düzenle" : "Yeni Paket Oluştur"}</h2>
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                 <input 
@@ -206,7 +243,7 @@ export default function PackagesPage() {
                   disabled={isLoading}
                   style={{ flex: 2, padding: "0.8rem", borderRadius: "0.75rem", border: "none", background: "var(--primary)", color: "#fff", fontWeight: 600, cursor: "pointer" }}
                 >
-                  {isLoading ? "Kaydediliyor..." : "Paketi Yayınla"}
+                  {isLoading ? "Kaydediliyor..." : (editingId ? "Güncelle" : "Paketi Yayınla")}
                 </button>
               </div>
             </form>
