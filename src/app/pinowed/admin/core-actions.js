@@ -52,6 +52,48 @@ export async function getReservations() {
   });
 }
 
+export async function checkAvailability(date, packageId, time = null) {
+  try {
+    const pkg = await prisma.photographyPackage.findUnique({ where: { id: packageId } });
+    if (!pkg) return { error: "Paket bulunamadı." };
+
+    const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    const nextDate = new Date(selectedDate);
+    nextDate.setDate(selectedDate.getDate() + 1);
+
+    // Find confirmed reservations for the same category on that day
+    const existingReservations = await prisma.reservation.findMany({
+      where: {
+        eventDate: {
+          gte: selectedDate,
+          lt: nextDate
+        },
+        status: { in: ["CONFIRMED", "COMPLETED"] },
+        package: { category: pkg.category }
+      }
+    });
+
+    if (pkg.timeType === "FULL_DAY" || pkg.timeType === "MORNING" || pkg.timeType === "EVENING") {
+      // For these types, we usually count the whole day or the specific period
+      // If the user wants specific evening capacity, we'd check eventTime too for "EVENING"
+      const count = existingReservations.length;
+      return { available: count < pkg.maxCapacity, count, max: pkg.maxCapacity };
+    }
+
+    if (pkg.timeType === "SLOT") {
+      // For slots, we check the specific time
+      const count = existingReservations.filter(r => r.eventTime === time).length;
+      return { available: count < pkg.maxCapacity, count, max: pkg.maxCapacity };
+    }
+
+    return { available: true };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
 export async function savePendingReservation(data) {
   try {
     const reservation = await prisma.reservation.create({
