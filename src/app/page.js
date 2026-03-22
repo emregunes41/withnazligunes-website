@@ -59,17 +59,17 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Kapsül Gardırop Sırları",
-          desc: "Az eşyayla 15+ kombin yaparak sürdürülebilir moda üzerinden bağ kurun.",
+          desc: "Az eşyayla 15+ kombin yaparak sürdürülebilir moda üzerinden bağ kurun. Minimalist yaşam tarzını modayla birleştirin.",
           scenario: "1. Hook: 'Elinizde sadece 5 parça olsa kaç kombin yapabilirsiniz? Ben 15 yaptım!' \n2. Body: Her parçayı farklı ortamlar için (iş, kahve, akşam) eşleştir. \n3. CTA: 'Senin favori parçan hangisi? Yorumlara yaz!'"
         },
         {
           title: "Nötr Tonların Gücü",
-          desc: "Baştan aşağı bej/beyaz giyinmenin 'pahalı' görünme sırlarını anlatın.",
+          desc: "Baştan aşağı bej/beyaz giyinmenin 'pahalı' görünme sırlarını anlatın. Sessiz lüks (quiet luxury) akımına odaklanın.",
           scenario: "1. Hook: 'Old money estetiği için binlerce dolar harcamanıza gerek yok.' \n2. Body: Dokuların (keten, ipek, pamuk) önemini ve ton sür ton giyinmeyi göster. \n3. CTA: 'Hangi dokuyu daha çok seviyorsun?'"
         },
         {
           title: "Aksesuarla Değişim",
-          desc: "Tek bir elbiseyi 3 farklı takı/çanta setiyle nasıl dönüştürürsünüz?",
+          desc: "Tek bir elbiseyi 3 farklı takı/çanta setiyle nasıl dönüştürürsünüz? Detayların bütünü nasıl değiştirdiğini kanıtlayın.",
           scenario: "1. Hook: 'Aynı elbiseyle hem düğüne hem işe gidilir mi?' \n2. Body: Önce sade, sonra gösterişli aksesuarlarla geçiş yap. \n3. CTA: 'Gündüz mü gece mi favorin?'"
         }
       ],
@@ -79,13 +79,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Hızlı Geçişli Kombinler",
-          desc: "Müzik ritmine göre kıyafet değiştirdiğiniz, yüksek enerjili bir Reels.",
+          desc: "Müzik ritmine göre kıyafet değiştirdiğiniz, yüksek enerjili bir Reels. Dinamik geçişler izleyiciyi tutar.",
           scenario: "1. Hook: Parmağını şıklatınca kıyafetin değişsin. \n2. Body: Haftanın her günü için bir kombin. \n3. CTA: 'Sence en iyisi hangisi?'"
         },
         {
           title: "Bu Sezonun 3 Favorisi",
-          desc: "Mağazada denediğiniz ve kesinlikle alınması gereken parçalar.",
+          desc: "Mağazada denediğiniz ve kesinlikle alınması gereken parçalar. Samimi bir alışveriş turu hissi verin.",
           scenario: "1. Hook: 'Bu parçalar yakında tükenecek, benden söylemesi!' \n2. Body: Ürünleri üzerinde göster ve neden sevdiğini 1-2 kelimeyle anlat. \n3. CTA: 'Link isteyenler yorumlara Link yazsın!'"
+        },
+        {
+          title: "Renk Bloklama (Color Blocking)",
+          desc: "Zıt renkleri cesurca kullanarak dikkat çekici bir stil oluşturma rehberi.",
+          scenario: "1. Hook: 'Sıkıcı kombinlerden bıktınız mı? Renkleri konuşturun!' \n2. Body: Turuncu ve mavi gibi zıt renkleri nasıl dengelediğini göster. \n3. CTA: 'Sen en çok hangi iki rengi yakıştırıyorsun?'"
         }
       ],
       tip: "Trend müziklerin beat-drop noktalarına göre geçişlerini ayarla, enerjin yüksek olsun!",
@@ -94,8 +99,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Vücut Tipine Göre Giyim",
-          desc: "Hangi kesimlerin hangi vücut tipinde daha iyi durduğunu gösteren rehber.",
+          desc: "Hangi kesimlerin hangi vücut tipinde daha iyi durduğunu gösteren rehber. Bilimsel ve estetik yaklaşın.",
           scenario: "1. Hook: 'Boyunuzu daha uzun göstermek istiyorsanız buraya bakın.' \n2. Body: Bel yüksekliği ve paça boyu gibi detayları yan yana karşılaştırmalı göster. \n3. CTA: 'Daha fazla tüyo için takip et!'"
+        },
+        {
+          title: "Kumaş Dedektifi",
+          desc: "Kumaş içeriklerini okuma ve kaliteli parçayı anlama rehberi. Polyester vs Pamuk karşılaştırması yapın.",
+          scenario: "1. Hook: 'Paranızın karşılığını almak istiyorsanız etiketleri okuyun.' \n2. Body: Farklı kumaş türlerini dokularıyla hissettir ve uzun ömürlülüklerini anlat. \n3. CTA: 'Dolabında en çok hangi kumaş var?'"
+        },
+        {
+          title: "Kombin Matematik Formülü",
+          desc: "Her sabah ne giyeceğim derdine son veren 3-layer kuralı. Pratik ve hızlı stil tüyoları.",
+          scenario: "1. Hook: '5 dakikada mükemmel görünmenin bir formülü var.' \n2. Body: Base layer, middle layer ve accessory adımlarını göster. \n3. CTA: 'Hangi adımı genelde unutuyorsun?'"
         }
       ],
       tip: "Bilgileri ekranda 'bullet point' olarak göster ki izleyici ekran görüntüsü alabilsin.",
@@ -104,8 +119,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Cinematic Hazırlık (GRWM)",
-          desc: "Yavaş çekimler ve loş ışıkla hazırlık sürecinizi sanatsallaştırın.",
+          desc: "Yavaş çekimler ve loş ışıkla hazırlık sürecinizi sanatsallaştırın. Atmosfer yaratmaya odaklanın.",
           scenario: "1. Hook: Güneş ışığının vurduğu bir ayna ve sabah kahvesi. \n2. Body: Kıyafetlerin asansörde veya sokaktaki yansımaları. \n3. CTA: 'Huzurlu bir gün dilerim...'"
+        },
+        {
+          title: "Vintage Keşifleri",
+          desc: "İkinci el veya vintage parçaları modern parçalarla harmanlama estetiği.",
+          scenario: "1. Hook: 'Bu parçanın 30 yıllık olduğuna kim inanır?' \n2. Body: Vintage bir ceketle modern bir jean kombinini şık çekimlerle sun. \n3. CTA: 'Eski mi yeni mi senin tarzın?'"
+        },
+        {
+          title: "Shadow & Light Play",
+          desc: "Işık ve gölge oyunlarını kullanarak kıyafetlerin dokusunu ön plana çıkaran sanatsal çekimler.",
+          scenario: "1. Hook: Gölgelerin arasında beliren şık bir silüet. \n2. Body: Işığın kumaş üzerindeki yansımasını makro çekimlerle göster. \n3. CTA: 'Işığını yansıt!'"
         }
       ],
       tip: "Renk paletine (Color Grading) önem ver, yumuşak tonlar estetik algıyı artırır.",
@@ -116,6 +141,16 @@ const RECOMMENDATIONS = {
           title: "Stil Yolculuğum",
           desc: "Eski hallerinizden bugünkü tarzınıza geçişinizi anlatan ilham verici video.",
           scenario: "1. Hook: 'Moda anlayışım nasıl değişti? Sürpriz sona hazır olun.' \n2. Body: Yıllar içindeki tarz değişimini fotoğraflarla anlat. \n3. CTA: 'Senin tarzın nasıl değişti?'"
+        },
+        {
+          title: "Bir Parçanın Hikayesi",
+          desc: "Sizin için manevi değeri olan bir kıyafetin arkasındaki duygusal hikaye.",
+          scenario: "1. Hook: 'Bu elbise sadece bir kumaş değil, bir hatıra.' \n2. Body: O kıyafeti aldığın veya giydiğin özel bir anıyı anlat. \n3. CTA: 'Senin dolabının en hikayeli parçası ne?'"
+        },
+        {
+          title: "Alışveriş Pişmanlıklarım",
+          desc: "Daha önce aldığınız ama hiç giymediğiniz parçalar üzerinden verdiğiniz stil dersleri.",
+          scenario: "1. Hook: 'Paramı çöpe attığım 3 parça...' \n2. Body: Neden hata yaptığını ve bir daha alırken nelere dikkat edeceğini anlat. \n3. CTA: 'Senin en büyük alışveriş pişmanlığın ne?'"
         }
       ],
       tip: "Kendi sesinle (Voiceover) konuşmak samimiyetinizi 2 katına çıkarır.",
@@ -126,8 +161,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Kablosuz ve Sade Setup",
-          desc: "Masanızdaki gereksiz kablolardan kurtulma ve minimal çalışma alanı.",
+          desc: "Masanızdaki gereksiz kablolardan kurtulma ve minimal çalışma alanı. Verimliliği artıran düzen.",
           scenario: "1. Hook: Masanın eski dağınık hali ve yeni hali. \n2. Body: Kablo düzenleyici ve minimalist aksesuarları göster. \n3. CTA: 'Masa düzenine 1-10 arası kaç verirsin?'"
+        },
+        {
+          title: "Dijital Minimalizm",
+          desc: "Telefonunuzu sadeleştirerek dikkatinizi nasıl geri kazanırsınız? Uygulama temizliği ve sade ana ekran.",
+          scenario: "1. Hook: 'Telefonunuz sizi yönetmesin, siz onu yönetin.' \n2. Body: Uygulama klasörleme ve gereksiz bildirimleri kapatma tüyoları. \n3. CTA: 'Günde kaç saat ekrana bakıyorsun?'"
+        },
+        {
+          title: "Geleceğin Teknolojisi: Şık Ürünler",
+          desc: "Tasarımıyla göz dolduran, evinizi veya ofisinizi güzelleştiren teknolojik aletler.",
+          scenario: "1. Hook: 'Hem akıllı hem de çok şık.' \n2. Body: Şeffaf tasarımlar veya mat bitişli yeni nesil cihazları incele. \n3. CTA: 'Tasarım mı performans mı?'"
         }
       ],
       tip: "Çekimlerde aşırı 'RGB' ışık yerine yumuşak, beyaz/sıcak ışık kullan.",
@@ -136,8 +181,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "iPhone Gizli Özelliği",
-          desc: "Kimsenin bilmediği, hayat kolaylaştıran bir iOS kısayolu.",
+          desc: "Kimsenin bilmediği, hayat kolaylaştıran bir iOS kısayolu. Keşfedilmeyi bekleyen pratikler.",
           scenario: "1. Hook: 'Telefonunuzda bu özelliği hala kullanmıyor musunuz?' \n2. Body: Adım adım ayarları göster. \n3. CTA: 'Kaydet ki unutma!'"
+        },
+        {
+          title: "Unboxing: Hızlandırılmış",
+          desc: "Müzikle senkronize, hızlı kesimli ve yüksek ses geçişli (ASMR) kutu açılışı.",
+          scenario: "1. Hook: Kutunun kapağının havada süzülerek açılması. \n2. Body: Ürünün içinden çıkan her parçanın hızlıca gösterilmesi. \n3. CTA: 'Kutudan ne çıksın istersin?'"
+        },
+        {
+          title: "Setup Build (Time-lapse)",
+          desc: "Boş bir masanın profesyonel bir oyuncu veya yazılımcı setup'ına dönüşmesi.",
+          scenario: "1. Hook: 'Karanlıktan ışığa: Yeni odamın doğuşu!' \n2. Body: Time-lapse ile masanın kurulması ve ışıkların yanması. \n3. CTA: 'Senin setup favorin ne?'"
         }
       ],
       tip: "Videonun ilk 3 saniyesinde mutlaka şaşırtıcı bir sonuç göster (Hook).",
@@ -146,8 +201,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Yapay Zeka ile Verimlilik",
-          desc: "İşlerinizi 10 kat hızlandıracak 3 yapay zeka aracı.",
+          desc: "İşlerinizi 10 kat hızlandıracak 3 yapay zeka aracı. Modern dünyanın yeni asistanları.",
           scenario: "1. Hook: 'Yapay zeka işinizi elinizden almayacak, onu kullananlar alacak.' \n2. Body: Araçları ekran kaydıyla hızlıca tanıt. \n3. CTA: 'Takipte kal!'"
+        },
+        {
+          title: "Yazılımcı Olmak İsteyenlere",
+          desc: "2026 yılında yazılıma nereden başlanır? Yol haritası ve temel diller.",
+          scenario: "1. Hook: 'Zengin olmak için değil, çözüm üretmek için kodlayın.' \n2. Body: Frontend, backend ve mobil geliştirme farklarını basitleştirerek anlat. \n3. CTA: 'Hangi dili öğrenmek istersin?'"
+        },
+        {
+          title: "Sanal Gerçeklik (VR) Geleceği",
+          desc: "VR ve AR teknolojilerinin günlük hayatımızı nasıl değiştireceğine dair öngörüler.",
+          scenario: "1. Hook: 'Şu an bir gözlüğün içinden dünyayı izliyorum.' \n2. Body: Mevcut VR uygulamalarını ve gelecek vizyonunu paylaş. \n3. CTA: 'Sanal dünya mı gerçek dünya mı?'"
         }
       ],
       tip: "Karmaşık terimleri analogiler kullanarak açıkla, herkesin anlayabileceği dil kullan.",
@@ -156,8 +221,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "ASMR Klavye Deneyimi",
-          desc: "Mekanik klavye sesleri ve makro çekimlerle teknoloji estetiği.",
+          desc: "Mekanik klavye sesleri ve makro çekimlerle teknoloji estetiği. İşitsel ve görsel tatmin.",
           scenario: "1. Hook: Klavyeye basan bir el ve yüksek kaliteli ses. \n2. Body: Tuşların ve ışıkların makro (yakın) çekimleri. \n3. CTA: 'Sesi sevenler buraya!'"
+        },
+        {
+          title: "Cyberpunk Şehir Gezisi",
+          desc: "Teknolojinin şehir ışıklarıyla buluştuğu neon atmosferli cinematic bir video.",
+          scenario: "1. Hook: Karanlıkta parlayan bir akıllı saat veya telefon. \n2. Body: Şehirdeki dijital ekranların ve ışıkların arasından geçişler. \n3. CTA: 'Gelecek burada mı?'"
+        },
+        {
+          title: "Product Cinematic B-Roll",
+          desc: "En sevdiğiniz teknolojik ürünün profesyonel reklam filmi gibi çekimi.",
+          scenario: "1. Hook: Ürünün üzerine düşen zarif bir ışık süzmesi. \n2. Body: Kameranın ürün etrafında yavaşça dönmesi ve detaylar. \n3. CTA: 'Tasarım harikası mı?'"
         }
       ],
       tip: "Detay çekimlerde (Macro) yüksek çözünürlük ve sığ alan derinliği kullan.",
@@ -168,8 +243,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Sabah Rutinim",
-          desc: "Güne sade ve odaklı başlamanın 3 basit adımı.",
+          desc: "Güne sade ve odaklı başlamanın 3 basit adımı. Zihinsel netliği artıran sabah ritüelleri.",
           scenario: "1. Hook: Telefonu uçak modunda bırakmanın huzuru. \n2. Body: Meditasyon, okuma ve planlama. \n3. CTA: 'Senin sabah ritüelin ne?'"
+        },
+        {
+          title: "Dijital Detoks Günü",
+          desc: "Bir gün boyunca tüm ekranlardan uzak kalmanın verdiği yenilenme hissi.",
+          scenario: "1. Hook: 'Bugün tüm bildirimleri susturdum.' \n2. Body: Doğa yürüyüşü, kitap okuma ve gerçek insanlarla bağ kurma. \n3. CTA: 'En son ne zaman ekransız bir gün geçirdin?'"
+        },
+        {
+          title: "Az Çoktur (Less is More)",
+          desc: "Evdeki veya zihindeki kalabalıkları atarak özgürleşme süreci.",
+          scenario: "1. Hook: 'Dağınıklık zihni yorar.' \n2. Body: Kullanılmayan eşyaların elenmesi ve ferahlayan alanların gösterilmesi. \n3. CTA: 'Bugün neyi hayatından çıkaracaksın?'"
         }
       ],
       tip: "Gürültüden uzak, temiz ses kaydı almayı unutma.",
@@ -178,8 +263,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Bu Hatayı Sakın Yapma!",
-          desc: "Sektörünüzde yeni başlayanların yaptığı en büyük yanlış.",
+          desc: "Sektörünüzde yeni başlayanların yaptığı en büyük yanlış. Deneyimle sabitlenmiş uyarılar.",
           scenario: "1. Hook: 'Eğer X sonucunu istiyorsan, Y yapmayı hemen bırak!' \n2. Body: Nedenini ve doğrusunu hızlıca anlat. \n3. CTA: 'Daha fazlası için profilime bak!'"
+        },
+        {
+          title: "Motivation Boost",
+          desc: "Düşük enerjili anlarda modunuzu yükseltecek 3 hızlı aksiyon.",
+          scenario: "1. Hook: 'Atalet seni yenmesin, uyan!' \n2. Body: Soğuk duş, sert bir müzik ve 10 şınav gibi hızlı eylemleri göster. \n3. CTA: 'Senin enerjini ne yükseltir?'"
+        },
+        {
+          title: "Challenge Time",
+          desc: "Takipçilerinizi de dahil edebileceğiniz 7 günlük bir gelişim meydan okuması.",
+          scenario: "1. Hook: '7 günde hayatımızı değiştiriyoruz, hazır mısın?' \n2. Body: Her gün yapılacak basit ama etkili görevi açıkla. \n3. CTA: 'Katılanlar yoruma Katılıyorum yazsın!'"
         }
       ],
       tip: "Videonun temposunu hiç düşürme, hızlı kesimler (Jump cuts) kullan.",
@@ -188,8 +283,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Sıfırdan Başlama Rehberi",
-          desc: "Herhangi bir konuda uzmanlaşmak için izlenecek 3 durak.",
+          desc: "Herhangi bir konuda uzmanlaşmak için izlenecek 3 durak. Öğrenme sürecini kolaylaştırın.",
           scenario: "1. Hook: 'Sıfırdan X olmak imkansız değil.' \n2. Body: 1. Adım Eğitim, 2. Uygulama, 3. Geri Bildirim. \n3. CTA: 'Sen hangi aşamadasın?'"
+        },
+        {
+          title: "Bilişsel Yanılgılar",
+          desc: "Karar verirken bizi yanıltan psikolojik mekanizmaların kısa açıklaması.",
+          scenario: "1. Hook: 'Neden hep yanlış seçimler yapıyoruz?' \n2. Body: Bir psikolojik deneyi veya kuralı basitçe anlat. \n3. CTA: 'Daha önce bunu yaşamış mıydın?'"
+        },
+        {
+          title: "3 Dakikada Uzmanlık",
+          desc: "Karmaşık görünen bir konunun en basit ve can alıcı noktalarını özetleyen video.",
+          scenario: "1. Hook: 'X konusunu 3 dakikada çözüyoruz.' \n2. Body: Whiteboard veya görsellerle konuyu basitleştir. \n3. CTA: 'Sırada hangi konu olsun?'"
         }
       ],
       tip: "İnsanlara 'Neden'ini anlat, sonra 'Nasıl'ına geç.",
@@ -198,8 +303,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Bir Günün Özeti (Moody)",
-          desc: "Hayatınızdan kesitlerin cinematic kurgusu.",
+          desc: "Hayatınızdan kesitlerin cinematic kurgusu. Melankolik ve estetik sahneler.",
           scenario: "1. Hook: Şık bir mekan girişi veya gün doğumu. \n2. Body: Estetik yemekler, kitaplar ve detaylar. \n3. CTA: 'Anı yaşa...'"
+        },
+        {
+          title: "Vibe Check: Rainy Day",
+          desc: "Yağmurlu bir günde evdeki huzurlu anların ve kahve keyfinin estetiği.",
+          scenario: "1. Hook: Cama vuran yağmur damlaları ve buğulu bir cam. \n2. Body: Battaniye, kitap, mum ışığı ve sıcak kahve sahneleri. \n3. CTA: 'Yağmuru sever misin?'"
+        },
+        {
+          title: "Golden Hour Magic",
+          desc: "Günün en güzel ışığında çekilmiş, yüksek kaliteli ve rüya gibi sekanslar.",
+          scenario: "1. Hook: Güneş batarken parlayan saçlar veya bir manzara. \n2. Body: Işığın yumuşak dokunuşlarıyla zenginleşen sahneler. \n3. CTA: 'Huzur burada...'"
         }
       ],
       tip: "Slow motion ve doğru müzik seçimi her şeyi estetikleştirir.",
@@ -208,8 +323,18 @@ const RECOMMENDATIONS = {
       ideas: [
         {
           title: "Nereden Nereye?",
-          desc: "Başarı hikayenizi veya zorlandığınız bir süreci samimiyetle paylaşın.",
+          desc: "Başarı hikayenizi veya zorlandığınız bir süreci samimiyetle paylaşın. İlham verici dönüm noktaları.",
           scenario: "1. Hook: 'Bana yapamazsın dediklerinde başladığım yer burasıydı.' \n2. Body: Başlangıçtaki zorluklar ve dönüm noktaları. \n3. CTA: 'Senin ilham kaynağın ne?'"
+        },
+        {
+          title: "Bir Kayıp Hikayesi",
+          desc: "Bir başarısızlıktan veya kayıptan çıkardığınız en büyük ders.",
+          scenario: "1. Hook: 'Her zaman kazanmıyoruz, bazen öğreniyoruz.' \n2. Body: Kaybettiğin zamanki hislerini ve nasıl ayağa kalktığını anlat. \n3. CTA: 'Senin düştüğünde tutunduğun şey ne?'"
+        },
+        {
+          title: "Görünmez Emek",
+          desc: "Dışarıdan kolay görünen bir işin arkasındaki saatler süren çalışmayı gösteren video.",
+          scenario: "1. Hook: 'Sadece 15 saniye sürdüğünü sanıyorlar değil mi?' \n2. Body: Hazırlık, hatalar, denemeler ve final sonucun hızlı kesimi. \n3. CTA: 'Emek her zaman değerlidir!'"
         }
       ],
       tip: "Samimiyet en büyük virallik anahtarıdır.",
@@ -678,6 +803,7 @@ function CreatorPanelSection() {
   const [selectedIdea, setSelectedIdea] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState(null);
+  const [aiError, setAiError] = useState(null);
 
   const handleNicheSelect = (id) => {
     setSelectedNiche(id || "custom");
@@ -692,11 +818,17 @@ function CreatorPanelSection() {
     
     setIsLoading(true);
     setAiRecommendations(null);
+    setAiError(null);
     try {
       const res = await generateIdeasAction(currentNicheLabel, styleId);
-      setAiRecommendations(res);
+      if (res && res.ideas && res.ideas.length > 0) {
+        setAiRecommendations(res);
+      } else {
+        throw new Error("Boş sonuç döndü");
+      }
     } catch (err) {
       console.error("AI Error:", err);
+      setAiError("Şu an standart strateji rehberini kullanıyoruz.");
     } finally {
       setIsLoading(false);
     }
@@ -721,6 +853,7 @@ function CreatorPanelSection() {
     setSelectedStyle("");
     setSelectedIdea(null);
     setAiRecommendations(null);
+    setAiError(null);
     setIsLoading(false);
   };
 
@@ -820,6 +953,7 @@ function CreatorPanelSection() {
                     <span className="res-badge">{currentNicheLabel}</span>
                     <span className="res-badge">{STYLES.find(s => s.id === selectedStyle)?.label}</span>
                     {aiRecommendations && <span className="res-badge ai-badge"><Cpu size={12} /> AI Modeli</span>}
+                    {aiError && <span className="res-badge error-badge"><Lightbulb size={12} /> Uzman Rehberi</span>}
                   </div>
                   <h3 className="results-heading">Nazlı'dan Stratejik Öneriler</h3>
                 </div>
