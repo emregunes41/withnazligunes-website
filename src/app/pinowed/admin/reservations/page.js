@@ -12,7 +12,7 @@ export default function ReservationsPage() {
   const [formData, setFormData] = useState({
     brideName: "", bridePhone: "", brideEmail: "",
     groomName: "", groomPhone: "", groomEmail: "",
-    eventDate: "", eventTime: "10:00", packageId: "", notes: ""
+    eventDate: "", eventTime: "10:00", packageIds: [], notes: ""
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function ReservationsPage() {
       setFormData({ 
         brideName: "", bridePhone: "", brideEmail: "",
         groomName: "", groomPhone: "", groomEmail: "",
-        eventDate: "", eventTime: "10:00", packageId: "", notes: "" 
+        eventDate: "", eventTime: "10:00", packageIds: [], notes: "" 
       });
       loadData();
     } else {
@@ -100,7 +100,7 @@ export default function ReservationsPage() {
                     {new Date(res.eventDate).toLocaleDateString('tr-TR')} {res.eventTime && `| ${res.eventTime}`}
                   </div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
-                    {res.package.name} ({res.paidAmount || "0 TL"} / {res.totalAmount || res.package.price})
+                    {res.packages.map(p => p.name).join(", ")} ({res.paidAmount || "0 TL"} / {res.totalAmount || "Hesaplanıyor"})
                   </div>
                 </td>
                 <td style={{ padding: "1.25rem" }}>
@@ -174,15 +174,26 @@ export default function ReservationsPage() {
                 value={formData.eventTime}
                 onChange={(e) => setFormData({...formData, eventTime: e.target.value})}
               />
-              <select 
-                required 
-                style={{ gridColumn: "span 2", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.packageId}
-                onChange={(e) => setFormData({...formData, packageId: e.target.value})}
-              >
-                <option value="">Paket Seçin...</option>
-                {packages.map(pkg => <option key={pkg.id} value={pkg.id}>{pkg.name} - {pkg.price}</option>)}
-              </select>
+              <div style={{ gridColumn: "span 2" }}>
+                <label style={{ fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.5rem", display: "block" }}>Paketler (Birden fazla seçebilirsin)</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", background: "var(--bg-card)", padding: "1rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}>
+                  {packages.map(pkg => (
+                    <label key={pkg.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", cursor: "pointer" }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.packageIds.includes(pkg.id)}
+                        onChange={(e) => {
+                          const ids = e.target.checked 
+                            ? [...formData.packageIds, pkg.id]
+                            : formData.packageIds.filter(id => id !== pkg.id);
+                          setFormData({...formData, packageIds: ids});
+                        }}
+                      />
+                      {pkg.name} ({pkg.price})
+                    </label>
+                  ))}
+                </div>
+              </div>
               <textarea 
                 placeholder="Notlar (Opsiyonel)" 
                 style={{ gridColumn: "span 2", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)", minHeight: "80px" }}

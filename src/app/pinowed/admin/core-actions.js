@@ -70,7 +70,7 @@ export async function deletePackage(id) {
 
 export async function getReservations() {
   return await prisma.reservation.findMany({
-    include: { package: true },
+    include: { packages: true },
     orderBy: { createdAt: 'desc' }
   });
 }
@@ -149,14 +149,16 @@ export async function savePendingReservation(data) {
 
 export async function createManualReservation(data) {
   try {
-    const { brideName, bridePhone, brideEmail, groomName, groomPhone, groomEmail, eventDate, eventTime, packageId, notes } = data;
+    const { brideName, bridePhone, brideEmail, groomName, groomPhone, groomEmail, eventDate, eventTime, packageIds, notes } = data;
     await prisma.reservation.create({
       data: {
         brideName, bridePhone, brideEmail,
         groomName, groomPhone, groomEmail,
         eventDate: new Date(eventDate),
         eventTime,
-        packageId,
+        packages: {
+          connect: packageIds.map(id => ({ id }))
+        },
         notes,
         status: "CONFIRMED", 
         paymentStatus: "UNPAID"
