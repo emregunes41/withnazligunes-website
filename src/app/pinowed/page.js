@@ -48,16 +48,21 @@ export default async function PinowedPage() {
         {/* Logo Container */}
         <div style={{ marginTop: "3rem", marginBottom: "4rem", textAlign: "center" }}>
           <div style={{ 
-            background: "rgba(255,255,255,0.05)", 
-            padding: "1rem 2rem", borderRadius: "1.5rem", 
-            backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)" 
+            width: "220px", height: "220px", 
+            borderRadius: "50%", 
+            overflow: "hidden",
+            border: "3px solid rgba(255,255,255,0.3)",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+            background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            margin: "0 auto"
           }}>
             <Image 
               src="/pinowed/assets/logo.jpg" 
               alt="Pinowed Logo" 
-              width={180} 
-              height={60} 
-              style={{ objectFit: "contain", borderRadius: "0.5rem" }}
+              width={220} 
+              height={220} 
+              style={{ objectFit: "cover" }}
             />
           </div>
         </div>
