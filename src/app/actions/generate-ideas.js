@@ -4,23 +4,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function generateIdeasAction(niche, style) {
-  let apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    // Deep search by value prefix
-    const foundKey = Object.keys(process.env).find(k => 
-      process.env[k] && typeof process.env[k] === 'string' && process.env[k].startsWith("AIza")
-    );
-    
-    if (foundKey) {
-      console.log(`Found matching key by value prefix: ${foundKey}`);
-      apiKey = process.env[foundKey];
-    } else {
-      const keys = Object.keys(process.env).slice(0, 10);
-      const geminiKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes("GEMINI"));
-      const keysCount = Object.keys(process.env).length;
-      return { error: `ERR_TOTAL_FAIL: [${keys.join(", ")}...]. Toplam: ${keysCount}. v1.0.6` };
-    }
+    console.error("GEMINI_API_KEY is missing");
+    return { error: "CONFIG_MISSING" };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -75,20 +62,19 @@ export async function generateIdeasAction(niche, style) {
     // JSON bloğunu temizleme
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return { error: "ERR_PARSE_FAIL: Geçerli bir JSON formatı üretilemedi." };
+      return { error: "PARSE_ERROR" };
     }
 
     const data = JSON.parse(jsonMatch[0]);
 
     // Fikir sayısını doğrula, LLM bazen eksik verebilir
     if (!data.ideas || data.ideas.length === 0) {
-      return { error: "ERR_EMPTY_RESULT: AI boş sonuç döndü." };
+      return { error: "EMPTY_RESULT" };
     }
 
     return data;
   } catch (error) {
     console.error("Gemini API Error details:", error);
-    const msg = error.message || "Unknown Error";
-    return { error: `ERR_API_FAIL: ${msg}` };
+    return { error: "API_ERROR" };
   }
 }
