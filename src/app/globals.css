@@ -24,8 +24,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  width: 100vw;
-  max-width: 100%;
+  width: 100%;
 }
 
 body {
@@ -35,8 +34,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  width: 100vw;
-  max-width: 100%;
+  width: 100%;
 }
 
 /* Scrollbar */
@@ -1088,62 +1086,109 @@ body {
 
 /* Mobile Optimization Overrides */
 @media (max-width: 768px) {
+  /* Layout constraints */
   .section {
-    padding: 4rem 1.25rem;
+    padding: 3rem 1rem;
   }
   .hero {
-    padding: 6rem 1.25rem 3rem;
+    padding: 5rem 1rem 3rem;
   }
+  
+  /* Typography Scale Down */
   .hero h1 {
-    font-size: clamp(2.2rem, 8vw, 3rem);
-    margin-bottom: 1rem;
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    margin-bottom: 0.75rem;
   }
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin-bottom: 2rem;
   }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .section-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Frame & Card Compaction */
   .creator-panel-card {
-    padding: 2rem 1.25rem;
-    border-radius: 1.5rem;
+    padding: 1.5rem 1rem;
+    border-radius: 1.25rem;
   }
   .detail-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
+    border-radius: 1.25rem;
   }
   .service-card, .coming-soon-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
+  
+  /* Feature Elements */
   .ideas-container {
     gap: 1rem;
   }
   .idea-item {
-    padding: 1.25rem;
+    padding: 1rem;
+    border-radius: 1rem;
   }
+  .idea-item-title {
+    font-size: 1rem;
+  }
+  .idea-desc {
+    font-size: 0.85rem;
+  }
+  .expert-insight-box {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Header adjustments */
   .step-header-with-badge {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .step-heading {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
   }
   .results-badge-group {
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .results-heading {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     margin-bottom: 1.5rem;
   }
+  
+  /* Nav & Footer */
   .navbar-inner {
-    padding: 0 1.25rem;
+    padding: 0 1rem;
   }
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+  
+  /* Buttons */
   .btn-primary, .btn-outline {
     width: 100%;
     justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
   }
   .panel-actions {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
   }
+  
   /* Remove fixed grids for niches on very small screens */
   .niche-grid, .style-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+  }
+  .niche-btn, .style-btn {
+    padding: 1rem;
   }
 }
