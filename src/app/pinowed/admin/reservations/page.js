@@ -10,7 +10,9 @@ export default function ReservationsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    clientName: "", clientPhone: "", clientEmail: "", eventDate: "", packageId: "", notes: ""
+    brideName: "", bridePhone: "", brideEmail: "",
+    groomName: "", groomPhone: "", groomEmail: "",
+    eventDate: "", eventTime: "10:00", packageId: "", notes: ""
   });
 
   useEffect(() => {
@@ -29,7 +31,11 @@ export default function ReservationsPage() {
     const res = await createManualReservation(formData);
     if (res.success) {
       setIsModalOpen(false);
-      setFormData({ clientName: "", clientPhone: "", clientEmail: "", eventDate: "", packageId: "", notes: "" });
+      setFormData({ 
+        brideName: "", bridePhone: "", brideEmail: "",
+        groomName: "", groomPhone: "", groomEmail: "",
+        eventDate: "", eventTime: "10:00", packageId: "", notes: "" 
+      });
       loadData();
     } else {
       alert("Hata: " + res.error);
@@ -83,18 +89,18 @@ export default function ReservationsPage() {
             {reservations.map((res) => (
               <tr key={res.id} style={{ borderBottom: "1px solid var(--border)" }}>
                 <td style={{ padding: "1.25rem" }}>
-                  <div style={{ fontWeight: 600 }}>{res.clientName}</div>
+                  <div style={{ fontWeight: 600 }}>{res.brideName} & {res.groomName}</div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.25rem" }}>
-                    <Phone size={12} /> {res.clientPhone}
+                    <Phone size={12} /> {res.bridePhone}
                   </div>
                 </td>
                 <td style={{ padding: "1.25rem" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: 500 }}>
                     <Calendar size={14} color="var(--primary)" />
-                    {new Date(res.eventDate).toLocaleDateString('tr-TR')}
+                    {new Date(res.eventDate).toLocaleDateString('tr-TR')} {res.eventTime && `| ${res.eventTime}`}
                   </div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
-                    {res.package.name}
+                    {res.package.name} ({res.paidAmount || "0 TL"} / {res.totalAmount || res.package.price})
                   </div>
                 </td>
                 <td style={{ padding: "1.25rem" }}>
@@ -133,28 +139,40 @@ export default function ReservationsPage() {
             <h2 style={{ marginBottom: "1.5rem", fontWeight: 800 }}>Yeni Rezervasyon Gir</h2>
             <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <input 
-                placeholder="Müşteri Adı Soyadı" required 
+                placeholder="Gelin Adı Soyadı" required 
                 style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.clientName}
-                onChange={(e) => setFormData({...formData, clientName: e.target.value})}
+                value={formData.brideName}
+                onChange={(e) => setFormData({...formData, brideName: e.target.value})}
               />
               <input 
-                placeholder="Telefon" required 
+                placeholder="Damat Adı Soyadı" required 
                 style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.clientPhone}
-                onChange={(e) => setFormData({...formData, clientPhone: e.target.value})}
+                value={formData.groomName}
+                onChange={(e) => setFormData({...formData, groomName: e.target.value})}
               />
               <input 
-                placeholder="E-posta" type="email" required 
+                placeholder="Gelin Telefon" required 
                 style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.clientEmail}
-                onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+                value={formData.bridePhone}
+                onChange={(e) => setFormData({...formData, bridePhone: e.target.value})}
+              />
+              <input 
+                placeholder="Gelin E-posta" type="email" required 
+                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                value={formData.brideEmail}
+                onChange={(e) => setFormData({...formData, brideEmail: e.target.value})}
               />
               <input 
                 type="date" required 
                 style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
                 value={formData.eventDate}
                 onChange={(e) => setFormData({...formData, eventDate: e.target.value})}
+              />
+              <input 
+                type="time" required 
+                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                value={formData.eventTime}
+                onChange={(e) => setFormData({...formData, eventTime: e.target.value})}
               />
               <select 
                 required 
