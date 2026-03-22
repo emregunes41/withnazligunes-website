@@ -1007,8 +1007,8 @@ function CreatorPanelSection() {
                     <div className="error-icon-box" style={{ marginBottom: '1.5rem', color: '#ff4b4b' }}>
                       <AlertTriangle size={48} />
                     </div>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Yapay Zeka Hazırlanıyor (v1.1.2)</h3>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Yapay Zeka Hazırlanıyor (v1.1.6)</h3>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', wordBreak: 'break-all' }}>
                       {aiError && aiError.includes("API_ERROR") ? `Detaylı Bilgi: ${aiError}` : "Nazlı'nın yapay zekası senin için fikirleri hazırlıyor. Lütfen bir saniye bekle..."}
                     </p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
