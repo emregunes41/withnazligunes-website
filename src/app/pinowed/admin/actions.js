@@ -50,7 +50,7 @@ export async function loginAdmin(username, password) {
     // Do NOT return redirect inside try/catch if it causes issues, but Next.js expects it to throw
   } catch (error) {
     console.error("Login Error:", error);
-    return { error: "Sistem hatası. Lütfen tekrar deneyin." };
+    return { error: `Sistem hatası: ${error.message}` };
   }
   
   redirect("/pinowed/admin/dashboard");
