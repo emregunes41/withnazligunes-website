@@ -57,6 +57,9 @@ export const authOptions = {
           name: user.name,
           email: user.email,
           role: user.role,
+          gender: user.gender,
+          age: user.age,
+          phone: user.phone,
         };
       },
     }),
@@ -66,9 +69,15 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.gender = user.gender;
+        token.age = user.age;
+        token.phone = user.phone;
       }
       if (trigger === "update" && session?.name) {
         token.name = session.name;
+        token.gender = session.gender;
+        token.age = session.age;
+        token.phone = session.phone;
       }
       return token;
     },
@@ -76,6 +85,9 @@ export const authOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.gender = token.gender;
+        session.user.age = token.age;
+        session.user.phone = token.phone;
       }
       return session;
     },
