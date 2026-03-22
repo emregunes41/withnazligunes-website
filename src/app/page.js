@@ -25,7 +25,9 @@ import {
   Cpu,
   AlertTriangle,
 } from "lucide-react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { generateIdeasAction } from "./actions/generate-ideas";
+import { registerMember } from "./actions/register-member";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -343,8 +345,147 @@ const RECOMMENDATIONS = {
   }
 };
 
+function AuthModal({ isOpen, onClose, mode, setMode }) {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    if (mode === "login") {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (res.error) {
+        setError(res.error);
+        setLoading(false);
+      } else {
+        onClose();
+        setLoading(false);
+      }
+    } else {
+      const res = await registerMember(data);
+      if (res.error) {
+        setError(res.error);
+        setLoading(false);
+      } else {
+        // Auto sign in after registration
+        await signIn("credentials", {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
+        onClose();
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div 
+        className="auth-modal glass glow-gold" 
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+      >
+        <button className="modal-close" onClick={onClose}><X /></button>
+        
+        <div className="auth-tabs">
+          <button 
+            className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
+            onClick={() => setMode('login')}
+          >
+            Giriş Yap
+          </button>
+          <button 
+            className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
+            onClick={() => setMode('register')}
+          >
+            Üye Ol
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          {mode === 'register' && (
+            <div className="form-group">
+              <label>Ad Soyad</label>
+              <input type="text" name="name" required placeholder="Nazlı Güneş" className="glass" />
+            </div>
+          )}
+          
+          <div className="form-group">
+            <label>E-posta</label>
+            <input type="email" name="email" required placeholder="merhaba@withnazligunes.com" className="glass" />
+          </div>
+          
+          <div className="form-group">
+            <label>Şifre</label>
+            <input type="password" name="password" required placeholder="••••••••" className="glass" />
+          </div>
+
+          {mode === "register" && (
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Cinsiyet</label>
+                  <select name="gender" className="glass">
+                    <option value="">Seçiniz</option>
+                    <option value="Kadın">Kadın</option>
+                    <option value="Erkek">Erkek</option>
+                    <option value="Diğer">Diğer</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Yaş</label>
+                  <input type="number" name="age" placeholder="25" className="glass" />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Telefon</label>
+                <input type="tel" name="phone" placeholder="0555 ••• •• ••" className="glass" />
+              </div>
+            </>
+          )}
+
+          {error && <p className="auth-error">{error}</p>}
+
+          <button type="submit" disabled={loading} className="btn-primary glow-gold w-full">
+            {loading ? "İşleniyor..." : (mode === "login" ? "Giriş Yap" : "Kayıt Ol")}
+          </button>
+
+          <div className="auth-divider">
+            <span>veya</span>
+          </div>
+
+          <button 
+            type="button" 
+            onClick={() => signIn("google")} 
+            className="btn-google w-full glass"
+          >
+            <img src="https://www.google.com/favicon.ico" alt="Google" width={18} height={18} />
+            Google ile {mode === 'login' ? 'Giriş Yap' : 'Devam Et'}
+          </button>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Home() {
+  const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login"); // "login" vs "register"
 
   const services = [
     {
@@ -383,6 +524,27 @@ export default function Home() {
             <li><a href="#hizmetler">Hizmetler</a></li>
             <li><a href="#egitimler">Eğitimler</a></li>
             <li><a href="#yakinda">Yakında</a></li>
+            {status === "authenticated" ? (
+              <li>
+                <button 
+                  onClick={() => signOut()} 
+                  className="nav-link-btn"
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}
+                >
+                  Çıkış Yap
+                </button>
+              </li>
+            ) : (
+              <li>
+                <button 
+                  onClick={() => { setAuthMode("login"); setAuthModalOpen(true); }}
+                  className="nav-link-btn"
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}
+                >
+                  Giriş Yap
+                </button>
+              </li>
+            )}
             <li>
               <a
                 href="https://randevu.withnazligunes.com"
@@ -415,6 +577,11 @@ export default function Home() {
             <a href="#hizmetler" onClick={() => setMobileMenuOpen(false)}>Hizmetler</a>
             <a href="#egitimler" onClick={() => setMobileMenuOpen(false)}>Eğitimler</a>
             <a href="#yakinda" onClick={() => setMobileMenuOpen(false)}>Yakında</a>
+            {status === "authenticated" ? (
+              <a href="#" onClick={() => { signOut(); setMobileMenuOpen(false); }}>Çıkış Yap</a>
+            ) : (
+              <a href="#" onClick={() => { setAuthMode("login"); setAuthModalOpen(true); setMobileMenuOpen(false); }}>Giriş Yap / Üye Ol</a>
+            )}
             <a
               href="https://randevu.withnazligunes.com"
               onClick={() => setMobileMenuOpen(false)}
@@ -512,7 +679,14 @@ export default function Home() {
         </div>
       </section>
 
-      <CreatorPanelSection />
+      <CreatorPanelSection session={session} onAuthRequired={() => { setAuthMode("register"); setAuthModalOpen(true); }} />
+
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+        mode={authMode} 
+        setMode={setAuthMode} 
+      />
 
       {/* SERVICES SECTION */}
       <hr className="section-divider" />
@@ -791,12 +965,18 @@ export default function Home() {
           </a>
         </div>
       </footer>
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+        mode={authMode}
+        setMode={setAuthMode}
+      />
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
     </>
   );
 }
 
-function CreatorPanelSection() {
+function CreatorPanelSection({ session, onAuthRequired }) {
   const [step, setStep] = useState(1);
   const [selectedNiche, setSelectedNiche] = useState("");
   const [customNiche, setCustomNiche] = useState("");
@@ -806,7 +986,13 @@ function CreatorPanelSection() {
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [aiError, setAiError] = useState(null);
 
+  const isLocked = !session;
+
   const handleNicheSelect = (id) => {
+    if (isLocked) {
+      onAuthRequired();
+      return;
+    }
     setSelectedNiche(id || "custom");
     setStep(2);
   };
@@ -878,7 +1064,27 @@ function CreatorPanelSection() {
           <p className="section-subtitle">Nişini ve tarzını seç, Nazlı'nın senin için hazırladığı viral potansiyeli yüksek fikirleri gör.</p>
         </div>
 
-        <div className="creator-panel-body">
+        <div className="creator-panel-body" style={{ position: 'relative' }}>
+          {isLocked && (
+            <div className="lock-overlay">
+              <div className="lock-content glass glow-gold">
+                <div className="lock-icon-circle">
+                  <Zap style={{ width: 24, height: 24, color: "var(--primary)" }} />
+                </div>
+                <h3>Bu Bölüm Üyelere Özel</h3>
+                <p>Yapay zeka destekli viral fikir üreticisine erişmek için ücretsiz üye ol.</p>
+                <div className="lock-actions">
+                  <button onClick={onAuthRequired} className="btn-primary glow-gold">
+                    Ücretsiz Kayıt Ol →
+                  </button>
+                  <button onClick={onAuthRequired} className="btn-outline">
+                    Giriş Yap
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
@@ -887,6 +1093,7 @@ function CreatorPanelSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 className="step-content"
+                style={{ filter: isLocked ? "blur(8px)" : "none", pointerEvents: isLocked ? "none" : "auto" }}
               >
                 <div className="step-count">ADIM 1 / 2</div>
                 <h3 className="step-heading">Hangi nişte içerik üretiyorsun?</h3>
