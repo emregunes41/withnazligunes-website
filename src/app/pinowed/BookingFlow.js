@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, User, Phone, Mail, ChevronRight, CreditCard, Clock, Info, Check } from "lucide-react";
+import { Calendar, User, Phone, Mail, ChevronRight, CreditCard, Clock, Info, Check, ShoppingCart, X, Plus } from "lucide-react";
 import { savePendingReservation, checkAvailability } from "./admin/core-actions";
 
 export default function BookingFlow({ initialPackages }) {
-  const [step, setStep] = useState(1); // 1: Package, 2: Details/Addons, 3: Payment Type, 4: iFrame
-  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [step, setStep] = useState(1); // 1: Package Selection, 2: Details/Addons, 3: Payment Type, 4: iFrame
+  const [selectedPackages, setSelectedPackages] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [formData, setFormData] = useState({ 
     brideName: "", bridePhone: "", brideEmail: "", 
@@ -15,17 +15,17 @@ export default function BookingFlow({ initialPackages }) {
     date: "", time: "10:00", notes: "" 
   });
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
-  const [availabilityError, setAvailabilityError] = useState(null);
+  const [availabilityErrors, setAvailabilityErrors] = useState({});
   const [contractAccepted, setContractAccepted] = useState(false);
-  const [paymentType, setPaymentType] = useState("deposit"); // deposit, full, custom
+  const [paymentType, setPaymentType] = useState("deposit");
   const [customAmount, setCustomAmount] = useState("");
   const [paytrToken, setPaytrToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // Price Calculations
-  const getPackagePrice = () => parseInt(selectedPackage?.price.replace(/[^0-9]/g, "")) || 0;
+  const getPackagesPrice = () => selectedPackages.reduce((sum, p) => sum + (parseInt(p.price.replace(/[^0-9]/g, "")) || 0), 0);
   const getAddonsPrice = () => selectedAddons.reduce((sum, a) => sum + (parseInt(a.price) || 0), 0);
-  const getTotalPrice = () => getPackagePrice() + getAddonsPrice();
+  const getTotalPrice = () => getPackagesPrice() + getAddonsPrice();
   const getMinDeposit = () => Math.round(getTotalPrice() * 0.2);
 
   const calculateFinalAmount = () => {
@@ -36,20 +36,31 @@ export default function BookingFlow({ initialPackages }) {
 
   // Availability Check
   useEffect(() => {
-    if (formData.date && selectedPackage) {
-      verifyAvailability();
+    if (formData.date && selectedPackages.length > 0) {
+      verifyAllAvailability();
     }
-  }, [formData.date, formData.time, selectedPackage]);
+  }, [formData.date, formData.time, selectedPackages]);
 
-  async function verifyAvailability() {
+  async function verifyAllAvailability() {
     setIsCheckingAvailability(true);
-    setAvailabilityError(null);
-    const res = await checkAvailability(formData.date, selectedPackage.id, formData.time);
-    if (!res.available) {
-      setAvailabilityError(`Bu tarih/saat maalesef dolu (${selectedPackage.name} için kapasite doldu).`);
+    const errors = {};
+    for (const pkg of selectedPackages) {
+      const res = await checkAvailability(formData.date, pkg.id, formData.time);
+      if (!res.available) {
+        errors[pkg.id] = `${pkg.name} için kapasite doldu.`;
+      }
     }
+    setAvailabilityErrors(errors);
     setIsCheckingAvailability(false);
   }
+
+  const togglePackage = (pkg) => {
+    if (selectedPackages.find(p => p.id === pkg.id)) {
+      setSelectedPackages(selectedPackages.filter(p => p.id !== pkg.id));
+    } else {
+      setSelectedPackages([...selectedPackages, pkg]);
+    }
+  };
 
   const toggleAddon = (addon) => {
     if (selectedAddons.find(a => a.title === addon.title)) {
@@ -61,7 +72,7 @@ export default function BookingFlow({ initialPackages }) {
 
   const startPayment = async () => {
     if (!contractAccepted) return alert("Lütfen sözleşmeyi onaylayın.");
-    if (availabilityError) return alert(availabilityError);
+    if (Object.keys(availabilityErrors).length > 0) return alert("Bazı paketler seçilen tarihte uygun değil.");
     
     const finalPrice = calculateFinalAmount();
     if (finalPrice < getMinDeposit()) return alert(`Minimum ödeme tutarı ${getMinDeposit()} TL'dir.`);
@@ -69,10 +80,9 @@ export default function BookingFlow({ initialPackages }) {
     setIsLoading(true);
 
     try {
-      // 1. Save Pending Reservation to DB
       const saveRes = await savePendingReservation({
         ...formData,
-        packageId: selectedPackage.id,
+        packageIds: selectedPackages.map(p => p.id),
         totalAmount: `${getTotalPrice()} TL`,
         paidAmount: `${finalPrice} TL`,
         selectedAddons: selectedAddons
@@ -80,7 +90,6 @@ export default function BookingFlow({ initialPackages }) {
 
       if (!saveRes.success) throw new Error(saveRes.error);
 
-      // 2. Get PayTR Token
       const res = await fetch("/api/paytr/checkout", {
         method: "POST",
         body: JSON.stringify({
@@ -89,8 +98,8 @@ export default function BookingFlow({ initialPackages }) {
           payment_amount: finalPrice * 100,
           user_name: `${formData.brideName} & ${formData.groomName}`,
           user_phone: formData.bridePhone,
-          user_address: `Event: ${formData.date} ${formData.time}`,
-          user_basket: JSON.stringify([[selectedPackage.name, `${finalPrice} TL`, 1]])
+          user_address: `Packages: ${selectedPackages.map(p => p.name).join(", ")} | Date: ${formData.date}`,
+          user_basket: JSON.stringify(selectedPackages.map(p => [p.name, p.price, 1]))
         })
       });
 
@@ -109,7 +118,7 @@ export default function BookingFlow({ initialPackages }) {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1100px', margin: '0 auto', paddingBottom: "5rem" }}>
       
       {/* Progress Stepper */}
       <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginBottom: "3rem" }}>
@@ -130,82 +139,112 @@ export default function BookingFlow({ initialPackages }) {
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div 
-            key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}
+            key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
           >
-            {initialPackages.map((pkg) => (
-              <div 
-                key={pkg.id} 
-                onClick={() => { setSelectedPackage(pkg); setStep(2); }}
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+              <h1 style={{ fontSize: "2.5rem", fontWeight: 900, marginBottom: "1rem" }}>Paketinizi Seçin</h1>
+              <p style={{ color: "var(--text-muted)" }}>Birden fazla paket seçerek sepetinizi oluşturabilirsiniz.</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+              {initialPackages.map((pkg) => {
+                const isSelected = selectedPackages.find(p => p.id === pkg.id);
+                return (
+                  <div 
+                    key={pkg.id} 
+                    onClick={() => togglePackage(pkg)}
+                    style={{ 
+                      background: 'var(--bg)', border: isSelected ? '3px solid var(--primary)' : '1px solid var(--border)', 
+                      padding: '2rem', borderRadius: '1.5rem', cursor: 'pointer', transition: 'all 0.2s',
+                      position: "relative"
+                    }}
+                    className="glass-hover"
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>{pkg.name}</h3>
+                      {isSelected && <div style={{ background: "var(--primary)", color: "#fff", padding: "0.4rem", borderRadius: "50%" }}><Check size={16} /></div>}
+                    </div>
+                    <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, background: "var(--primary-muted)", color: "var(--primary)", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.price} TL</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.5rem" }}>{pkg.timeType === "SLOT" ? "2 Saat" : "Tüm Gün"}</span>
+                    </div>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem', minHeight: "3rem" }}>{pkg.description}</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                      {pkg.features.slice(0, 3).map((f, i) => (
+                        <span key={i} style={{ fontSize: "0.7rem", background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.4rem" }}>{f}</span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Floating Cart Bar */}
+            {selectedPackages.length > 0 && (
+              <motion.div 
+                initial={{ y: 100 }} animate={{ y: 0 }}
                 style={{ 
-                  background: 'var(--bg)', border: selectedPackage?.id === pkg.id ? '2px solid var(--primary)' : '1px solid var(--border)', 
-                  padding: '2rem', borderRadius: '1.5rem', cursor: 'pointer', transition: 'all 0.2s'
+                  position: "fixed", bottom: "2rem", left: "50%", transform: "translateX(-50%)",
+                  background: "var(--bg)", border: "1px solid var(--border)", padding: "1rem 2rem",
+                  borderRadius: "2rem", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
+                  display: "flex", alignItems: "center", gap: "2rem", zIndex: 100, width: "90%", maxWidth: "600px"
                 }}
-                className="glass-hover"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{pkg.name}</h3>
-                  <span style={{ fontSize: '1rem', fontWeight: 800 }}>{pkg.price} TL</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--primary)" }}>SEPETİNİZ ({selectedPackages.length} Paket)</div>
+                  <div style={{ fontSize: "1.2rem", fontWeight: 800 }}>TOPLAM: {getPackagesPrice()} TL</div>
                 </div>
-                <div style={{ fontSize: "0.75rem", color: "var(--primary)", fontWeight: 700, marginBottom: "0.5rem" }}>
-                  {pkg.timeType === "FULL_DAY" ? "TÜM GÜN" : pkg.timeType === "SLOT" ? "2 SAATLİK ÇEKİM" : pkg.timeType === "MORNING" ? "GÜNDÜZ" : "AKŞAM"}
-                </div>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{pkg.description}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "1.5rem" }}>
-                  {pkg.features.slice(0, 3).map((f, i) => (
-                    <span key={i} style={{ fontSize: "0.7rem", background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.4rem" }}>{f}</span>
-                  ))}
-                </div>
-                <button style={{ 
-                  width: '100%', background: 'var(--primary)', color: '#fff', border: 'none', padding: '0.8rem', borderRadius: '1rem', fontWeight: 600,
-                  display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem'
-                }}>
-                  Seç ve Devam Et <ChevronRight size={16} />
+                <button 
+                  onClick={() => setStep(2)}
+                  style={{ background: "var(--primary)", color: "#fff", border: "none", padding: "0.8rem 1.5rem", borderRadius: "1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}
+                >
+                  Devam Et <ChevronRight size={18} />
                 </button>
-              </div>
-            ))}
+              </motion.div>
+            )}
           </motion.div>
         )}
 
         {step === 2 && (
           <motion.div 
             key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-            style={{ maxWidth: '850px', margin: '0 auto', background: 'var(--bg)', padding: '2.5rem', borderRadius: '2rem', border: '1px solid var(--border)' }}
+            style={{ maxWidth: '950px', margin: '0 auto', background: 'var(--bg)', padding: '2.5rem', borderRadius: '2rem', border: '1px solid var(--border)' }}
           >
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "2rem", textAlign: "center" }}>Rezervasyon Detayları</h2>
+            <h2 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "2rem", textAlign: "center" }}>Rezervasyon Detayları</h2>
             
-            <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "2rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "2.5rem" }}>
               
-              {/* Left Column: Forms */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                {/* Contact Info */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label style={{ fontSize: "0.8rem", fontWeight: 700 }}>GELİN ADI SOYADI</label>
-                    <input style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
+                    <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)" }}>GELİN ADI SOYADI</label>
+                    <input style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)", fontSize: "0.95rem" }} 
                       value={formData.brideName} onChange={e => setFormData({...formData, brideName: e.target.value})} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label style={{ fontSize: "0.8rem", fontWeight: 700 }}>DAMAT ADI SOYADI</label>
-                    <input style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
+                    <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)" }}>DAMAT ADI SOYADI</label>
+                    <input style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)", fontSize: "0.95rem" }} 
                       value={formData.groomName} onChange={e => setFormData({...formData, groomName: e.target.value})} />
                   </div>
-                  <input placeholder="Gelin Telefon" style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
+                  <input placeholder="Gelin Telefon" style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
                     value={formData.bridePhone} onChange={e => setFormData({...formData, bridePhone: e.target.value})} />
-                  <input placeholder="Gelin E-posta" type="email" style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
+                  <input placeholder="Gelin E-posta" type="email" style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
                     value={formData.brideEmail} onChange={e => setFormData({...formData, brideEmail: e.target.value})} />
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                {/* Scheduling */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label style={{ fontSize: "0.8rem", fontWeight: 700 }}>TARİH</label>
-                    <input type="date" style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
+                    <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)" }}>ETKİNLİK TARİHİ</label>
+                    <input type="date" style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)" }} 
                       min={new Date().toISOString().split('T')[0]}
                       value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
                   </div>
-                  {selectedPackage.timeType === "SLOT" && (
+                  {selectedPackages.some(p => p.timeType === "SLOT") && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                      <label style={{ fontSize: "0.8rem", fontWeight: 700 }}>SAAT PERİYODU</label>
-                      <select style={{ padding: "0.8rem", borderRadius: "1rem", border: "1px solid var(--border)" }}
+                      <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--text-muted)" }}>SAAT PERİYODU (SLOT TARZI PAKETLER İÇİN)</label>
+                      <select style={{ padding: "0.9rem", borderRadius: "1rem", border: "1px solid var(--border)" }}
                         value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})}>
                         {["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"].map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
@@ -213,47 +252,58 @@ export default function BookingFlow({ initialPackages }) {
                   )}
                 </div>
 
-                {availabilityError && <div style={{ color: "#EF4444", fontSize: "0.85rem", fontWeight: 600 }}>⚠️ {availabilityError}</div>}
-
                 <textarea 
-                  placeholder="Bilmemiz gereken notlar..." 
-                  style={{ padding: "1rem", borderRadius: "1rem", border: "1px solid var(--border)", minHeight: "80px" }}
+                  placeholder="Ekstra notlar, istekler veya bilmemiz gereken detaylar..." 
+                  style={{ padding: "1.2rem", borderRadius: "1.2rem", border: "1px solid var(--border)", minHeight: "100px" }}
                   value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}
                 />
               </div>
 
-              {/* Right Column: Add-ons */}
-              <div style={{ background: "var(--bg-card)", padding: "1.5rem", borderRadius: "1.5rem", border: "1px solid var(--border)" }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 800, marginBottom: "1rem", color: "var(--primary)" }}>PAKET EKSTRALARI</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                  {selectedPackage.addons?.map((addon, i) => (
-                    <div 
-                      key={i} 
-                      onClick={() => toggleAddon(addon)}
-                      style={{ 
-                        padding: "1rem", borderRadius: "1rem", border: "1px solid var(--border)", 
-                        background: selectedAddons.find(a => a.title === addon.title) ? "#fff" : "transparent",
-                        cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center"
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: "18px", height: "18px", border: "2px solid var(--primary)", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {selectedAddons.find(a => a.title === addon.title) && <Check size={12} color="var(--primary)" />}
-                        </div>
-                        <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{addon.title}</span>
+              {/* Sidebar: Summary & Addons */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div style={{ background: "var(--bg-card)", padding: "1.5rem", borderRadius: "1.5rem", border: "1px solid var(--border)" }}>
+                  <h3 style={{ fontSize: "0.9rem", fontWeight: 900, marginBottom: "1.2rem", color: "var(--primary)" }}>MÜSAİTLİK VE ÖZET</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    {selectedPackages.map(pkg => (
+                      <div key={pkg.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
+                        <span style={{ fontWeight: 600 }}>{pkg.name}</span>
+                        {availabilityErrors[pkg.id] ? (
+                          <span style={{ color: "#EF4444", fontWeight: 700 }}>DOLU!</span>
+                        ) : (
+                          <span style={{ color: "#10B981", fontWeight: 700 }}>UYGUN</span>
+                        )}
                       </div>
-                      <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>+{addon.price} TL</span>
-                    </div>
-                  ))}
-                  {(!selectedPackage.addons || selectedPackage.addons.length === 0) && <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Bu paket için ek hizmet bulunmuyor.</p>}
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ background: "var(--bg-card)", padding: "1.5rem", borderRadius: "1.5rem", border: "1px solid var(--border)" }}>
+                  <h3 style={{ fontSize: "0.9rem", fontWeight: 900, marginBottom: "1.2rem", color: "var(--primary)" }}>PAKET EKSTRALARI</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                    {selectedPackages.flatMap(p => p.addons || []).map((addon, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => toggleAddon(addon)}
+                        style={{ 
+                          padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)", 
+                          background: selectedAddons.find(a => a.title === addon.title) ? "#fff" : "transparent",
+                          cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center"
+                        }}
+                      >
+                        <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>{addon.title}</span>
+                        <span style={{ fontSize: "0.8rem", fontWeight: 800 }}>+{addon.price} TL</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
             </div>
 
-            <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-              <button onClick={() => setStep(1)} style={{ flex: 1, padding: "1rem", borderRadius: "1rem", border: "1px solid var(--border)", background: "transparent", fontWeight: 600 }}>Geri</button>
-              <button onClick={() => setStep(3)} disabled={!formData.date || availabilityError} style={{ flex: 2, padding: "1rem", borderRadius: "1rem", border: "none", background: "var(--primary)", color: "#fff", fontWeight: 700 }}>
+            <div style={{ display: "flex", gap: "1rem", marginTop: "3rem" }}>
+              <button onClick={() => setStep(1)} style={{ flex: 1, padding: "1rem", borderRadius: "1rem", border: "1px solid var(--border)", background: "transparent", fontWeight: 700 }}>Geri</button>
+              <button onClick={() => setStep(3)} disabled={!formData.date || Object.keys(availabilityErrors).length > 0} 
+                style={{ flex: 2, padding: "1rem", borderRadius: "1rem", border: "none", background: "var(--primary)", color: "#fff", fontWeight: 800 }}>
                 Ödeme Adımına Geç ({getTotalPrice()} TL)
               </button>
             </div>
@@ -263,48 +313,40 @@ export default function BookingFlow({ initialPackages }) {
         {step === 3 && (
           <motion.div 
             key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-            style={{ maxWidth: '600px', margin: '0 auto', background: 'var(--bg)', padding: '2.5rem', borderRadius: '2rem', border: '1px solid var(--border)' }}
+            style={{ maxWidth: '650px', margin: '0 auto', background: 'var(--bg)', padding: '3rem', borderRadius: '2.5rem', border: '1px solid var(--border)' }}
           >
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1.5rem", textAlign: "center" }}>Ödeme Yöntemini Seçin</h2>
-            <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-              <p style={{ color: "var(--text-muted)" }}>Toplam Tutar: <span style={{ fontWeight: 800, color: "var(--text)" }}>{getTotalPrice()} TL</span></p>
-              {selectedAddons.length > 0 && <p style={{ fontSize: "0.8rem", color: "var(--primary)" }}>{selectedAddons.length} adet ekstra dahil edildi.</p>}
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div onClick={() => setPaymentType("deposit")} style={{ padding: "1.5rem", borderRadius: "1.25rem", border: "1px solid var(--border)", background: paymentType === "deposit" ? "var(--primary-muted)" : "transparent", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><div style={{ fontWeight: 700 }}>%20 Ön Ödeme (Kapora)</div><div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Rezervasyon için minimum tutar.</div></div>
-                <div style={{ fontWeight: 800 }}>{getMinDeposit()} TL</div>
+            <h2 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "2rem", textAlign: "center" }}>Ödeme Yöntemi</h2>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+              <div onClick={() => setPaymentType("deposit")} style={{ padding: "1.5rem", borderRadius: "1.5rem", border: "2px solid", borderColor: paymentType === "deposit" ? "var(--primary)" : "var(--border)", background: paymentType === "deposit" ? "var(--primary-muted)" : "transparent", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div><div style={{ fontWeight: 800 }}>%20 Rezervasyon Ücreti (Kapora)</div><div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Kalan tutar etkinlik günü ödenir.</div></div>
+                <div style={{ fontSize: "1.2rem", fontWeight: 900 }}>{getMinDeposit()} TL</div>
               </div>
-              <div onClick={() => setPaymentType("full")} style={{ padding: "1.5rem", borderRadius: "1.25rem", border: "1px solid var(--border)", background: paymentType === "full" ? "var(--primary-muted)" : "transparent", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><div style={{ fontWeight: 700 }}>Tam Ödeme</div><div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Paket tutarının tamamı.</div></div>
-                <div style={{ fontWeight: 800 }}>{getTotalPrice()} TL</div>
-              </div>
-              <div onClick={() => setPaymentType("custom")} style={{ padding: "1.5rem", borderRadius: "1.25rem", border: "1px solid var(--border)", background: paymentType === "custom" ? "var(--primary-muted)" : "transparent", cursor: "pointer", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div style={{ fontWeight: 700 }}>Belirli Bir Tutar</div><Info size={16} color="var(--text-muted)" /></div>
-                {paymentType === "custom" && <input type="number" placeholder={`Min: ${getMinDeposit()} TL`} style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--primary)", width: "100%" }} value={customAmount} onChange={e => setCustomAmount(e.target.value)} onClick={e => e.stopPropagation()} />}
+              <div onClick={() => setPaymentType("full")} style={{ padding: "1.5rem", borderRadius: "1.5rem", border: "2px solid", borderColor: paymentType === "full" ? "var(--primary)" : "var(--border)", background: paymentType === "full" ? "var(--primary-muted)" : "transparent", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div><div style={{ fontWeight: 800 }}>Tam Ödeme</div><div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Tüm paket fiyatını şimdi öde.</div></div>
+                <div style={{ fontSize: "1.2rem", fontWeight: 900 }}>{getTotalPrice()} TL</div>
               </div>
             </div>
 
-            <div style={{ marginTop: "2rem", padding: "1rem", background: "#F9FAFB", borderRadius: "1rem", border: "1px solid var(--border)" }}>
-              <label style={{ display: "flex", gap: "0.75rem", cursor: "pointer", fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                <input type="checkbox" checked={contractAccepted} onChange={e => setContractAccepted(e.target.checked)} />
-                <span>Hizmet sözleşmesini ve KVKK metnini onaylıyorum.</span>
+            <div style={{ marginTop: "2rem", padding: "1.2rem", background: "var(--bg-card)", borderRadius: "1.2rem", border: "1px solid var(--border)" }}>
+              <label style={{ display: "flex", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem", color: "var(--text)" }}>
+                <input type="checkbox" checked={contractAccepted} onChange={e => setContractAccepted(e.target.checked)} style={{ width: "18px", height: "18px" }} />
+                <span>Hizmet sözleşmesini ve KVKK politikalarını onaylıyorum.</span>
               </label>
             </div>
 
-            <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
-              <button onClick={() => setStep(2)} style={{ flex: 1, padding: "1rem", borderRadius: "1rem", border: "1px solid var(--border)", background: "transparent", fontWeight: 600 }}>Geri</button>
-              <button onClick={startPayment} disabled={isLoading || isCheckingAvailability} style={{ flex: 2, padding: "1rem", borderRadius: "1rem", border: "none", background: "var(--primary)", color: "#fff", fontWeight: 700, display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem" }}>
-                {isLoading ? "Yönlendiriliyor..." : `${calculateFinalAmount()} TL Öde`} <ChevronRight size={18} />
+            <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+              <button onClick={() => setStep(2)} style={{ flex: 1, padding: "1.1rem", borderRadius: "1.2rem", border: "1px solid var(--border)", background: "transparent", fontWeight: 700 }}>Geri</button>
+              <button onClick={startPayment} disabled={isLoading} style={{ flex: 2, padding: "1.1rem", borderRadius: "1.2rem", border: "none", background: "var(--primary)", color: "#fff", fontWeight: 800, display: "flex", justifyContent: "center", alignItems: "center", gap: "0.5rem" }}>
+                {isLoading ? "Hazırlanıyor..." : `${calculateFinalAmount()} TL Öde`} <ChevronRight size={20} />
               </button>
             </div>
           </motion.div>
         )}
 
         {step === 4 && paytrToken && (
-          <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", background: "#fff", borderRadius: "1.5rem", overflow: "hidden" }}>
-            <iframe src={`https://www.paytr.com/odeme/guvenli/${paytrToken}`} id="paytriframe" frameBorder="0" scrolling="no" style={{ width: "100%", height: "650px" }}></iframe>
+          <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", background: "#fff", borderRadius: "2rem", overflow: "hidden", minHeight: "700px" }}>
+            <iframe src={`https://www.paytr.com/odeme/guvenli/${paytrToken}`} id="paytriframe" frameBorder="0" scrolling="no" style={{ width: "100%", height: "700px" }}></iframe>
           </motion.div>
         )}
       </AnimatePresence>

@@ -129,7 +129,9 @@ export async function savePendingReservation(data) {
         groomEmail: data.groomEmail,
         eventDate: new Date(data.date),
         eventTime: data.time,
-        packageId: data.packageId,
+        packages: {
+          connect: data.packageIds.map(id => ({ id }))
+        },
         notes: data.notes,
         totalAmount: data.totalAmount,
         paidAmount: data.paidAmount,
