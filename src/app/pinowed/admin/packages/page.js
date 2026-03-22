@@ -7,8 +7,10 @@ import { getPackages, createPackage, deletePackage } from "../core-actions";
 export default function PackagesPage() {
   const [packages, setPackages] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "", price: "", features: "" });
-  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({ 
+    name: "", description: "", price: "", features: "", 
+    category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
+  });
 
   useEffect(() => {
     loadPackages();
@@ -25,7 +27,10 @@ export default function PackagesPage() {
     const res = await createPackage(formData);
     if (res.success) {
       setIsModalOpen(false);
-      setFormData({ name: "", description: "", price: "", features: "" });
+      setFormData({ 
+        name: "", description: "", price: "", features: "", 
+        category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
+      });
       loadPackages();
     }
     setIsLoading(false);
@@ -95,33 +100,89 @@ export default function PackagesPage() {
           <div style={{ background: "var(--bg)", padding: "2.5rem", borderRadius: "1.5rem", width: "100%", maxWidth: "500px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
             <h2 style={{ marginBottom: "1.5rem", fontWeight: 800 }}>Yeni Paket Oluştur</h2>
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <input 
-                placeholder="Paket Adı (Örn: Düğün Hikayesi)" 
-                required 
-                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-              />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <input 
+                  placeholder="Paket Adı" required 
+                  style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                />
+                <input 
+                  placeholder="Fiyat (Örn: 5000)" required 
+                  style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <select 
+                  style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                >
+                  <option value="STANDARD">Standart Çekim</option>
+                  <option value="EXTERIOR">Dış Çekim</option>
+                  <option value="VIDEO">Video / Klip</option>
+                </select>
+                <select 
+                  style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                  value={formData.timeType}
+                  onChange={(e) => setFormData({...formData, timeType: e.target.value})}
+                >
+                  <option value="FULL_DAY">Tüm Gün</option>
+                  <option value="SLOT">2 Saatlik Periyot</option>
+                  <option value="MORNING">Gündüz</option>
+                  <option value="EVENING">Akşam</option>
+                </select>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <span style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>Aynı anda maks. kapasite:</span>
+                <input 
+                  type="number" required 
+                  style={{ width: "80px", padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
+                  value={formData.maxCapacity}
+                  onChange={(e) => setFormData({...formData, maxCapacity: e.target.value})}
+                />
+              </div>
+
               <textarea 
-                placeholder="Kısa Açıklama" 
-                required 
-                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)", minHeight: "100px" }}
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-              />
-              <input 
-                placeholder="Fiyat (Örn: 5.000 TL)" 
-                required 
-                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-              />
-              <input 
                 placeholder="Özellikler (Virgülle ayırarak yaz)" 
                 required 
                 style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
                 value={formData.features}
                 onChange={(e) => setFormData({...formData, features: e.target.value})}
+              />
+
+              <div style={{ border: "1px dashed var(--border)", padding: "1rem", borderRadius: "0.75rem" }}>
+                <div style={{ fontSize: "0.85rem", fontWeight: 700, marginBottom: "0.5rem" }}>Ekstralar (Add-ons)</div>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const title = prompt("Ekstra adı?");
+                    const price = prompt("Fiyatı (TL)?");
+                    if (title && price) setFormData({...formData, addons: [...formData.addons, { title, price }]});
+                  }}
+                  style={{ fontSize: "0.75rem", padding: "0.4rem 0.8rem", borderRadius: "0.5rem", border: "1px solid var(--primary)", color: "var(--primary)", background: "transparent" }}
+                >
+                  + Yeni Ekstra Ekle
+                </button>
+                <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                  {formData.addons.map((a, i) => (
+                    <span key={i} style={{ fontSize: "0.7rem", background: "#f3f4f6", padding: "0.2rem 0.5rem", borderRadius: "0.4rem" }}>
+                      {a.title} (+{a.price} TL)
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <textarea 
+                placeholder="Kısa Açıklama" 
+                required 
+                style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)", minHeight: "60px" }}
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
               />
               <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
                 <button 

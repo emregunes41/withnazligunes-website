@@ -13,13 +13,17 @@ export async function getPackages() {
 
 export async function createPackage(data) {
   try {
-    const { name, description, price, features } = data;
+    const { name, description, price, features, category, timeType, maxCapacity, addons } = data;
     await prisma.photographyPackage.create({
       data: {
         name,
         description,
         price,
+        category: category || "STANDARD",
+        timeType: timeType || "FULL_DAY",
+        maxCapacity: parseInt(maxCapacity) || 1,
         features: features.split(',').map(f => f.trim()).filter(f => f !== ""),
+        addons: addons || [], // Expected as [{ title, price }]
       }
     });
     revalidatePath('/pinowed/admin/packages');

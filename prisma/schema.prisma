@@ -20,7 +20,11 @@ model PhotographyPackage {
   name        String
   description String
   price       String
-  features    String[]      // Array of feature strings
+  category    String        @default("STANDARD") // STANDARD, EXTERIOR, VIDEO
+  timeType    String        @default("FULL_DAY") // FULL_DAY, SLOT, MORNING, EVENING
+  maxCapacity Int           @default(1)
+  features    String[]
+  addons      Json?                         // Array of { id, title, price }
   isActive    Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -42,8 +46,9 @@ model Reservation {
   status        String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
   contractLog   String?  // IP/Timestamp of contract approval
   paymentStatus String   @default("UNPAID")  // UNPAID, DEPOSIT_PAID, PAID
-  totalAmount   String?  // Total price of package
-  paidAmount    String?  // Amount actually paid in this transaction
+  totalAmount   String?  // Total price (package + addons)
+  paidAmount    String?  // Amount paid in this transaction
+  selectedAddons Json?   // [{ title, price }]
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
