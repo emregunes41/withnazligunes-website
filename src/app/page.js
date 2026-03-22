@@ -1015,7 +1015,7 @@ function CreatorPanelSection() {
                       <button onClick={() => handleStyleSelect(selectedStyle)} className="btn-primary">
                         <RefreshCw size={18} /> Yeniden Dene
                       </button>
-                      <button onClick={handleReset} className="btn-reset">
+                      <button onClick={resetPanel} className="btn-reset">
                         Vazgeç
                       </button>
                     </div>
