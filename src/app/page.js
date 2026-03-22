@@ -534,15 +534,27 @@ export default function Home() {
             <li><a href="#egitimler">Eğitimler</a></li>
             <li><a href="#yakinda">Yakında</a></li>
             {status === "authenticated" ? (
-              <li>
-                <button 
-                  onClick={() => signOut()} 
-                  className="nav-link-btn"
-                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}
-                >
-                  Çıkış Yap
-                </button>
-              </li>
+              <>
+                <li>
+                  <a href="/profil" className="nav-profile-link">
+                    {session.user.image ? (
+                      <img src={session.user.image} alt="Profil" className="nav-profile-img" />
+                    ) : (
+                      <div className="nav-profile-circle">{session.user.name?.[0] || 'U'}</div>
+                    )}
+                    <span>Profilim</span>
+                  </a>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => signOut()} 
+                    className="nav-link-btn"
+                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500 }}
+                  >
+                    Çıkış Yap
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <button 
@@ -587,7 +599,10 @@ export default function Home() {
             <a href="#egitimler" onClick={() => setMobileMenuOpen(false)}>Eğitimler</a>
             <a href="#yakinda" onClick={() => setMobileMenuOpen(false)}>Yakında</a>
             {status === "authenticated" ? (
-              <a href="#" onClick={() => { signOut(); setMobileMenuOpen(false); }}>Çıkış Yap</a>
+              <>
+                <a href="/profil" onClick={() => setMobileMenuOpen(false)}>Profilim</a>
+                <a href="#" onClick={() => { signOut(); setMobileMenuOpen(false); }}>Çıkış Yap</a>
+              </>
             ) : (
               <a href="#" onClick={() => { setAuthMode("login"); setAuthModalOpen(true); setMobileMenuOpen(false); }}>Giriş Yap / Üye Ol</a>
             )}
