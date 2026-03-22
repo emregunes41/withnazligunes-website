@@ -11,6 +11,7 @@ export default function PackagesPage() {
     name: "", description: "", price: "", features: "", 
     category: "STANDARD", timeType: "FULL_DAY", maxCapacity: "1", addons: [] 
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadPackages();
