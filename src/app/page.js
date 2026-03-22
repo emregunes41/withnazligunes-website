@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Loader2,
   Cpu,
+  AlertTriangle,
 } from "lucide-react";
 import { generateIdeasAction } from "./actions/generate-ideas";
 
@@ -955,9 +956,8 @@ function CreatorPanelSection() {
                     <span className="res-badge">{currentNicheLabel}</span>
                     <span className="res-badge">{STYLES.find(s => s.id === selectedStyle)?.label}</span>
                     {aiRecommendations && <span className="res-badge ai-badge"><Cpu size={12} /> AI Modeli</span>}
-                    {aiError && <span className="res-badge error-badge"><Lightbulb size={12} /> Uzman Rehberi</span>}
                   </div>
-                  <h3 className="results-heading">Nazlı'dan Stratejik Öneriler</h3>
+                  <h3 className="results-heading">Yapay Zeka Önerileri</h3>
                 </div>
 
                 {isLoading ? (
@@ -966,16 +966,17 @@ function CreatorPanelSection() {
                     <Loader2 className="ai-spinner" />
                     <p className="ai-loading-text">Nazlı'nın Yapay Zekası Senin İçin Kurguluyor...</p>
                   </div>
-                ) : (
+                ) : aiRecommendations ? (
                   <>
                     <div className="ideas-container">
-                      {getRecommendations().ideas.map((idea, idx) => (
+                      {aiRecommendations.ideas.map((idea, idx) => (
                         <motion.div 
                           key={idx} 
-                          className="idea-item glass"
+                          className="idea-item glass glass-hover"
                           initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.15 }}
+                          whileHover={{ scale: 1.02, borderColor: "var(--primary)" }}
                         >
                           <div className="idea-header">
                             <span className="idea-number">0{idx + 1}</span>
@@ -996,12 +997,31 @@ function CreatorPanelSection() {
                     <div className="expert-insight-box glow-gold">
                       <div className="insight-header">
                         <Lightbulb className="w-5 h-5 text-gold" />
-                        <span>Ufuk Açıcı Bilgi</span>
+                        <span>Yapay Zeka Tüyosu</span>
                       </div>
-                      <p className="insight-text">{getRecommendations().tip}</p>
+                      <p className="insight-text">{aiRecommendations.tip}</p>
                     </div>
                   </>
-                )}
+                ) : aiError ? (
+                  <div className="error-state-container glass glow-gold" style={{ padding: '3rem', textAlign: 'center', borderRadius: '1.5rem', background: 'rgba(255, 75, 75, 0.05)', border: '1px solid rgba(255, 75, 75, 0.2)' }}>
+                    <div className="error-icon-box" style={{ marginBottom: '1.5rem', color: '#ff4b4b' }}>
+                      <AlertTriangle size={48} />
+                    </div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Sistem Meşgul</h3>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                      Yapay zeka şu an çok yoğun veya kotası dolmuş durumda. Lütfen biraz bekleyip tekrar dene.
+                    </p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                      <button onClick={() => handleStyleSelect(selectedStyle)} className="btn-primary">
+                        <RefreshCw size={18} /> Yeniden Dene
+                      </button>
+                      <button onClick={handleReset} className="btn-reset">
+                        Vazgeç
+                      </button>
+                    </div>
+                    {aiError && <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', marginTop: '2rem' }}>Hata Kodu: {aiError}</p>}
+                  </div>
+                ) : null}
 
                 <div className="panel-actions" style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap", marginTop: "2rem" }}>
                   <button onClick={resetPanel} className="btn-outline">
