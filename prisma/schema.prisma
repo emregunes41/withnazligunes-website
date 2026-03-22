@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String   // Hashed password
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PhotographyPackage {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  price       String
+  features    String[]      // Array of feature strings
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  reservations Reservation[]
+}
+
+model Reservation {
+  id            String   @id @default(cuid())
+  clientName    String
+  clientPhone   String
+  clientEmail   String
+  eventDate     DateTime
+  packageId     String
+  status        String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  contractLog   String?  // IP/Timestamp of contract approval
+  paymentStatus String   @default("UNPAID")  // UNPAID, DEPOSIT_PAID, PAID
+  totalAmount   String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  package       PhotographyPackage @relation(fields: [packageId], references: [id])
+}
