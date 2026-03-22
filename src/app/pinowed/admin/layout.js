@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Package, CalendarDays, LogOut } from "lucide-react";
+import { logoutAdmin } from "./actions";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -50,14 +51,8 @@ export default function AdminLayout({ children }) {
           })}
         </nav>
 
-        {/* Logout (Since it requires a Server Action, we can use a small form or just a client click to an API, but for simplicity we can use an unstyled button that triggers the action, or just a Link to a logout route) */}
-        <form action={async () => {
-          "use server";
-          const { cookies } = await import("next/headers");
-          cookies().delete("admin_token");
-          const { redirect } = await import("next/navigation");
-          redirect("/pinowed/admin/login");
-        }}>
+        {/* Logout via Server Action */}
+        <form action={logoutAdmin}>
           <button type="submit" style={{ 
             display: "flex", alignItems: "center", gap: "1rem", padding: "1rem", 
             width: "100%", background: "transparent", border: "none", color: "#EF4444", 
