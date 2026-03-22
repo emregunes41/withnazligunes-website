@@ -39,7 +39,8 @@ export async function loginAdmin(username, password) {
     const token = await signToken({ adminId: admin.id, username: admin.username });
     
     // 4. Set HttpOnly Cookie
-    cookies().set("admin_token", token, {
+    const cookieStore = await cookies();
+    cookieStore.set("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -57,6 +58,7 @@ export async function loginAdmin(username, password) {
 }
 
 export async function logoutAdmin() {
-  cookies().delete("admin_token");
+  const cookieStore = await cookies();
+  cookieStore.delete("admin_token");
   redirect("/pinowed/admin/login");
 }
