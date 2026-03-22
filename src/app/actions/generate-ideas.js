@@ -12,29 +12,41 @@ export async function generateIdeasAction(niche, style) {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 1.0,
       topP: 0.95,
       topK: 40,
       maxOutputTokens: 2048,
+      responseMimeType: "application/json",
     }
   });
 
-  const prompt = `GÖREV: ${niche} nişi için ${style} tarzında 3 adet viral içerik fikri üret.
-  
-  FORMAT (Sadece bu JSON objesini döndür):
-  {
-    "ideas": [
-      {
-        "ideas": [
-          { "title": "...", "desc": "...", "scenario": "..." },
-          { "title": "...", "desc": "...", "scenario": "..." },
-          { "title": "...", "desc": "...", "scenario": "..." }
-        ],
-        "tip": "..."
-      }
-    - JSON bloğunu \`\`\`json ve \`\`\` arasına alabilirsin.
+  const prompt = `
+    Sen bir sosyal medya stratejisti ve Nazlı Güneş'in (withnazligunes) üst düzey yapay zeka asistanısın. 
+    Kullanıcının seçtiği Niş: ${niche}
+    Seçilen İçerik Tarzı: ${style}
+
+    GÖREV:
+    Bu niş ve tarz için etkileşim potansiyeli en yüksek, KESİNLİKLE 3 ADET BİRBİRİNDEN FARKLI ve ÇOK DETAYLI içerik fikri üret. 
+    Her fikir; kancası, gelişmesi ve kapanışıyla tam bir viral senaryo içermeli.
+
+    Ayrıca bu nişe özel, profesyonel vizyon katan genel bir strateji tüyosu ("tip" alanı) ver.
+
+    ÇIKTI FORMATI:
+    SADECE VE SADECE JSON objesi döndür. Kesinlikle markdown, düz metin veya giriş/çıkış cümlesi kullanma. Çıktın şu JSON yapısında olmalı:
+    {
+      "ideas": [
+        {
+          "title": "Vuran Bir Başlık",
+          "desc": "Fikrin kısa özeti ve neden viral olacağı (En az 3 cümle)",
+          "scenario": "1. Saniye (Hook): ... \\n3. Saniye (Gelişme): ... \\nFinal (Call to Action): ... \\n(Detaylı senaryo)"
+        }
+      ],
+      "tip": "Bu niş için genel vizyoner tüyo"
+    }
+
+    DİL: Türkçe.
   `;
 
   try {
