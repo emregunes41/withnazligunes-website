@@ -30,15 +30,20 @@ model PhotographyPackage {
 
 model Reservation {
   id            String   @id @default(cuid())
-  clientName    String
-  clientPhone   String
-  clientEmail   String
+  brideName     String
+  bridePhone    String
+  brideEmail    String
+  groomName     String?
+  groomPhone    String?
+  groomEmail    String?
   eventDate     DateTime
+  eventTime     String? // Format HH:mm
   packageId     String
   status        String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
   contractLog   String?  // IP/Timestamp of contract approval
   paymentStatus String   @default("UNPAID")  // UNPAID, DEPOSIT_PAID, PAID
-  totalAmount   String?
+  totalAmount   String?  // Total price of package
+  paidAmount    String?  // Amount actually paid in this transaction
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
