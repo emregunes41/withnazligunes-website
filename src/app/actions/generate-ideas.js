@@ -16,9 +16,10 @@ export async function generateIdeasAction(niche, style) {
       console.log(`Found matching key by value prefix: ${foundKey}`);
       apiKey = process.env[foundKey];
     } else {
+      const keys = Object.keys(process.env).slice(0, 10);
       const geminiKeys = Object.keys(process.env).filter(k => k.toUpperCase().includes("GEMINI"));
       const keysCount = Object.keys(process.env).length;
-      return { error: `ERR_DEEP_FAIL: 'AIza' ile başlayan değer bulunamadı. Toplam Key: ${keysCount}. Benzer İsimler: [${geminiKeys.join(", ") || "YOK"}]. v1.0.5` };
+      return { error: `ERR_TOTAL_FAIL: [${keys.join(", ")}...]. Toplam: ${keysCount}. v1.0.6` };
     }
   }
 
