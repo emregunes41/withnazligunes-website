@@ -12,42 +12,27 @@ export async function generateIdeasAction(niche, style) {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     generationConfig: {
-      temperature: 1.0,
-      topP: 0.95,
-      topK: 40,
-      maxOutputTokens: 2048,
       responseMimeType: "application/json",
     }
   });
 
-  const prompt = `
-    Sen bir sosyal medya stratejisti ve Nazlı Güneş'in (withnazligunes) üst düzey yapay zeka asistanısın. 
-    Kullanıcının seçtiği Niş: ${niche}
-    Seçilen İçerik Tarzı: ${style}
-
-    GÖREV:
-    Bu niş ve tarz için etkileşim potansiyeli en yüksek, KESİNLİKLE 3 ADET BİRBİRİNDEN FARKLI ve ÇOK DETAYLI içerik fikri üret. 
-    Her fikir; kancası, gelişmesi ve kapanışıyla tam bir viral senaryo içermeli.
-
-    Ayrıca bu nişe özel, profesyonel vizyon katan genel bir strateji tüyosu ("tip" alanı) ver.
-
-    ÇIKTI FORMATI:
-    SADECE VE SADECE JSON objesi döndür. Kesinlikle markdown, düz metin veya giriş/çıkış cümlesi kullanma. Çıktın şu JSON yapısında olmalı:
-    {
-      "ideas": [
-        {
-          "title": "Vuran Bir Başlık",
-          "desc": "Fikrin kısa özeti ve neden viral olacağı (En az 3 cümle)",
-          "scenario": "1. Saniye (Hook): ... \\n3. Saniye (Gelişme): ... \\nFinal (Call to Action): ... \\n(Detaylı senaryo)"
-        }
-      ],
-      "tip": "Bu niş için genel vizyoner tüyo"
-    }
-
-    DİL: Türkçe.
-  `;
+  const prompt = `GÖREV: ${niche} nişi için ${style} tarzında 3 adet detaylı viral içerik fikri üret.
+  
+  FORMAT (SADECE JSON DÖNDÜR):
+  {
+    "ideas": [
+      {
+        "title": "Vuran Bir Başlık",
+        "desc": "Neden viral olacağı ve özet (en az 3 cümle)",
+        "scenario": "Senaryo detayları (Hook, Gelişme, Final)"
+      }
+    ],
+    "tip": "Profesyonel vizyoner tüyo"
+  }
+  
+  DİL: Türkçe. Çıktıda yalnızca JSON olsun.`;
 
   try {
     const result = await model.generateContent(prompt);
@@ -62,7 +47,7 @@ export async function generateIdeasAction(niche, style) {
 
     if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
       const info = `Len: ${text.length}, First: ${firstBrace}, Last: ${lastBrace}`;
-      return { error: `PARSE_ERROR_NO_JSON: ${info}. Başlangıç: ${text.slice(0, 50)}...` };
+      return { error: `PARSE_ERROR_NO_JSON: ${info}. Text: ${text.slice(0, 100)}...` };
     }
 
     const jsonString = text.substring(firstBrace, lastBrace + 1);
@@ -73,7 +58,6 @@ export async function generateIdeasAction(niche, style) {
       return { error: `PARSE_ERROR_INVALID: ${jsonString.slice(0, 50)}...` };
     }
 
-    // Fikir sayısını doğrula, LLM bazen eksik verebilir
     if (!data.ideas || data.ideas.length === 0) {
       return { error: "EMPTY_RESULT" };
     }
@@ -81,7 +65,18 @@ export async function generateIdeasAction(niche, style) {
     return data;
   } catch (error) {
     console.error("Gemini API Error details:", error);
-    const apiErrorMsg = error.message || "Bilinmeyen API Hatası";
+    let apiErrorMsg = error.message || "Bilinmeyen API Hatası";
+    
+    // Diagnostic: Try to fetch available models
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+      const d = await res.json();
+      if (d && d.models) {
+        const models = d.models.map(m => m.name.replace('models/', '')).filter(n => n.includes('gemini'));
+        apiErrorMsg += ` | Modeller: ${models.slice(0, 5).join(', ')}`;
+      }
+    } catch(e) {}
+
     return { error: `API_ERROR: ${apiErrorMsg.slice(0, 500)}` };
   }
 }
