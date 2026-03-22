@@ -955,7 +955,7 @@ function CreatorPanelSection() {
                   <div className="results-badge-group">
                     <span className="res-badge">{currentNicheLabel}</span>
                     <span className="res-badge">{STYLES.find(s => s.id === selectedStyle)?.label}</span>
-                    {aiRecommendations && <span className="res-badge ai-badge"><Cpu size={12} /> AI Modeli</span>}
+                    {aiError && <span className="res-badge error-badge"><Lightbulb size={12} /> Yapay Zeka Hazırlanıyor (v1.0.8)</span>}
                   </div>
                   <h3 className="results-heading">Yapay Zeka Önerileri</h3>
                 </div>
