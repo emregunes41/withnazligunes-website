@@ -953,7 +953,7 @@ function CreatorPanelSection() {
                     <span className="res-badge">{currentNicheLabel}</span>
                     <span className="res-badge">{STYLES.find(s => s.id === selectedStyle)?.label}</span>
                     {aiRecommendations && <span className="res-badge ai-badge"><Cpu size={12} /> AI Modeli</span>}
-                    {aiError && <span className="res-badge error-badge" title={aiError}><Lightbulb size={12} /> {aiError.length > 25 ? "Uzman Rehberi (Hata)" : aiError}</span>}
+                    {aiError && <span className="res-badge error-badge" title={aiError}><Lightbulb size={12} /> {aiError}</span>}
                   </div>
                   <h3 className="results-heading">Nazlı'dan Stratejik Öneriler</h3>
                 </div>
