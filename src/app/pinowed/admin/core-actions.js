@@ -110,6 +110,7 @@ export async function savePendingReservation(data) {
         notes: data.notes,
         totalAmount: data.totalAmount,
         paidAmount: data.paidAmount,
+        selectedAddons: data.selectedAddons || [], // Save the array of {title, price}
         status: "PENDING",
         paymentStatus: "UNPAID"
       }
