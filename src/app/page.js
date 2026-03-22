@@ -1007,9 +1007,9 @@ function CreatorPanelSection() {
                     <div className="error-icon-box" style={{ marginBottom: '1.5rem', color: '#ff4b4b' }}>
                       <AlertTriangle size={48} />
                     </div>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Sistem Meşgul (v1.1.0)</h3>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Yapay Zeka Hazırlanıyor (v1.1.1)</h3>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
-                      {aiError.includes("API_ERROR") ? `Daha detaylı hata: ${aiError}` : "Yapay zeka şu an çok yoğun veya kotası dolmuş durumda. Lütfen biraz bekleyip tekrar dene."}
+                      {aiError && aiError.includes("API_ERROR") ? `Detaylı hata: ${aiError}` : "Nazlı'nın yapay zekası senin için kurguluyor. Lütfen bekle..."}
                     </p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                       <button onClick={() => handleStyleSelect(selectedStyle)} className="btn-primary">
