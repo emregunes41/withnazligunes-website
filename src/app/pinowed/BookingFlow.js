@@ -7,6 +7,7 @@ import { savePendingReservation, checkAvailability } from "./admin/core-actions"
 
 export default function BookingFlow({ initialPackages }) {
   const [step, setStep] = useState(1); // 1: Package Selection, 2: Details/Addons, 3: Payment Type, 4: iFrame
+  const [activeCategory, setActiveCategory] = useState("Hepsi");
   const [selectedPackages, setSelectedPackages] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [formData, setFormData] = useState({ 
@@ -146,8 +147,29 @@ export default function BookingFlow({ initialPackages }) {
               <p style={{ color: "var(--text-muted)" }}>Birden fazla paket seçerek sepetinizi oluşturabilirsiniz.</p>
             </div>
 
+            {/* Category Tabs */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginBottom: "3rem", flexWrap: "wrap" }}>
+              {["Hepsi", ...new Set(initialPackages.map(p => p.category))].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  style={{
+                    padding: "0.6rem 1.2rem", borderRadius: "2rem", border: "1px solid",
+                    borderColor: activeCategory === cat ? "var(--primary)" : "var(--border)",
+                    background: activeCategory === cat ? "var(--primary)" : "transparent",
+                    color: activeCategory === cat ? "#fff" : "var(--text)",
+                    fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", transition: "all 0.2s"
+                  }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-              {initialPackages.map((pkg) => {
+              {initialPackages
+                .filter(p => activeCategory === "Hepsi" || p.category === activeCategory)
+                .map((pkg) => {
                 const isSelected = selectedPackages.find(p => p.id === pkg.id);
                 return (
                   <div 

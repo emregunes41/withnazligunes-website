@@ -167,9 +167,11 @@ export default function PackagesPage() {
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
                 >
-                  <option value="STANDARD">Standart Çekim</option>
-                  <option value="EXTERIOR">Dış Çekim</option>
-                  <option value="VIDEO">Video / Klip</option>
+                  <option value="Düğün Hikayesi">Düğün Hikayesi</option>
+                  <option value="Dış Çekim">Dış Çekim</option>
+                  <option value="Söz / Nişan">Söz / Nişan</option>
+                  <option value="Sünnet">Sünnet</option>
+                  <option value="Diğer">Diğer</option>
                 </select>
                 <select 
                   style={{ padding: "0.8rem", borderRadius: "0.75rem", border: "1px solid var(--border)" }}
