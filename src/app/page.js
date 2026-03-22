@@ -366,11 +366,12 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
       });
 
       if (res.error) {
-        setError(res.error);
+        setError(res.error === "CredentialsSignin" ? "Hatalı email veya şifre." : res.error);
         setLoading(false);
       } else {
         onClose();
         setLoading(false);
+        window.location.reload(); // Refresh to update session state
       }
     } else {
       const res = await registerMember(data);
@@ -379,13 +380,21 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
         setLoading(false);
       } else {
         // Auto sign in after registration
-        await signIn("credentials", {
+        const signInRes = await signIn("credentials", {
           redirect: false,
           email: data.email,
           password: data.password,
         });
-        onClose();
-        setLoading(false);
+        
+        if (signInRes?.error) {
+          setMode("login");
+          setError("Kayıt başarılı ancak giriş yapılamadı. Lütfen şifrenizle giriş yapın.");
+          setLoading(false);
+        } else {
+          onClose();
+          setLoading(false);
+          window.location.reload(); // Refresh to update session state
+        }
       }
     }
   };
