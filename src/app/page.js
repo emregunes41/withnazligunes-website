@@ -606,7 +606,10 @@ export default function Home() {
                 <a href="#" onClick={() => { signOut(); setMobileMenuOpen(false); }}>Çıkış Yap</a>
               </>
             ) : (
-              <a href="#" onClick={() => { setAuthMode("login"); setAuthModalOpen(true); setMobileMenuOpen(false); }}>Giriş Yap / Üye Ol</a>
+              <>
+                <a href="#" onClick={() => { setAuthMode("login"); setAuthModalOpen(true); setMobileMenuOpen(false); }}>Giriş Yap</a>
+                <a href="#" onClick={() => { setAuthMode("register"); setAuthModalOpen(true); setMobileMenuOpen(false); }}>Üye Ol</a>
+              </>
             )}
             <a
               href="https://randevu.withnazligunes.com"
@@ -707,7 +710,7 @@ export default function Home() {
         </div>
       </section>
 
-      <CreatorPanelSection session={session} onAuthRequired={() => { setAuthMode("register"); setAuthModalOpen(true); }} />
+      <CreatorPanelSection session={session} onAuthRequired={(mode = "login") => { setAuthMode(mode); setAuthModalOpen(true); }} />
 
       <AuthModal 
         isOpen={authModalOpen} 
@@ -1154,10 +1157,10 @@ function CreatorPanelSection({ session, onAuthRequired }) {
                     <h3>Bu Bölüm Üyelere Özel</h3>
                     <p>Yapay zeka destekli viral fikir üreticisine erişmek için ücretsiz üye ol.</p>
                     <div className="lock-actions">
-                      <button onClick={onAuthRequired} className="btn-primary glow-gold">
+                      <button onClick={() => onAuthRequired("register")} className="btn-primary glow-gold">
                         Ücretsiz Kayıt Ol →
                       </button>
-                      <button onClick={onAuthRequired} className="btn-outline">
+                      <button onClick={() => onAuthRequired("login")} className="btn-outline">
                         Giriş Yap
                       </button>
                     </div>
