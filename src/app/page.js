@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
