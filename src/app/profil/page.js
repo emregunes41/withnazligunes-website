@@ -3,13 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Calendar, ShoppingBag, Clock } from "lucide-react";
-import { updateUser } from "@/app/actions/update-user";
-import { getUserData } from "@/app/actions/get-user-data";
-import { format } from "date-fns";
-import { tr } from "date-fns/locale";
-import { activateTrial } from "@/app/actions/activate-trial";
-import { Zap, AlertCircle } from "lucide-react";
+import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Calendar, ShoppingBag, Clock, Video, FileText, Zap, AlertCircle } from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
@@ -202,62 +196,88 @@ export default function ProfilePage() {
                       {/* Trial Section */}
                       <TrialSection user={userData || session.user} onActivate={handleActivateTrial} loading={loading} />
 
-                      {/* Digital Purchases Section (Including Trial) */}
+                      {/* Digital Purchases Section (Premium Grid) */}
                       {(userData.purchases?.length > 0 || userData.isTrialUsed) && (
                         <div className="purchase-section">
                           <h3 className="section-title">
-                            <ShoppingBag size={18} className="text-gold" />
+                            <ShoppingBag size={20} className="text-gold" />
                             Dijital Ürünlerim
                           </h3>
-                          <div className="purchase-list">
-                            {/* Virtual Trial Item */}
+                          
+                          <div className="purchase-grid">
+                            {/* Virtual Trial Item - Premium Card */}
                             {userData.isTrialUsed && (
-                              <div className="purchase-item glass hover-glow border-gold-subtle">
-                                <div className="purchase-item-header">
-                                  <div className="purchase-item-info">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                      <h4 className="purchase-name">Viral İçerik Paneli (7 Günlük Deneme)</h4>
-                                      <div className="viral-badge" style={{ padding: '2px 6px', fontSize: '10px' }}>DENEME</div>
+                              <div className="premium-purchase-card glass hover-glow border-gold-subtle">
+                                <div className="card-inner">
+                                  <div className="card-top">
+                                    <div className="product-icon-wrapper trial">
+                                      <Zap size={24} className="text-gold" />
                                     </div>
-                                    <div className="purchase-meta">
-                                      <span className="meta-item">Hediye Kodu / Deneme</span>
-                                      <span className="meta-divider">•</span>
-                                      <span className="meta-item">
+                                    <div className="product-badge trial">DENEME</div>
+                                  </div>
+                                  
+                                  <div className="card-content">
+                                    <h4 className="product-title">Viral İçerik Paneli (7 Günlük Deneme)</h4>
+                                    <div className="product-meta-tags">
+                                      <span className="tag">Hediye Kodu / Deneme</span>
+                                      <span className="tag-dot">•</span>
+                                      <span className="tag">
                                         {format(new Date(userData.trialStartDate), "dd MMM yyyy", { locale: tr })}
                                       </span>
                                     </div>
                                   </div>
-                                  <div className="purchase-price">Hediye</div>
+                                  
+                                  <div className="card-footer">
+                                    <div className="product-price">Hediye</div>
+                                    <button 
+                                      onClick={() => router.push('/#creator-panel')} 
+                                      className="btn-card-action glow-gold"
+                                    >
+                                      <span>İçeriğe Git</span>
+                                      <ChevronRight size={16} />
+                                    </button>
+                                  </div>
                                 </div>
-                                <button onClick={() => router.push('/#creator-panel')} className="purchase-action-btn">
-                                  <span>İçeriğe Git</span>
-                                  <ChevronRight size={14} />
-                                </button>
                               </div>
                             )}
 
-                            {/* Real Purchases */}
-                            {userData.purchases?.map((purchase) => (
-                              <div key={purchase.id} className="purchase-item glass hover-glow">
-                                <div className="purchase-item-header">
-                                  <div className="purchase-item-info">
-                                    <h4 className="purchase-name">{purchase.productName}</h4>
-                                    <div className="purchase-meta">
-                                      <span className="meta-item">{purchase.productType}</span>
-                                      <span className="meta-divider">•</span>
-                                      <span className="meta-item">
-                                        {format(new Date(purchase.purchaseDate), "dd MMM yyyy", { locale: tr })}
-                                      </span>
+                            {/* Real Purchases - Premium Cards */}
+                            {userData.purchases?.map((purchase) => {
+                              const isCourse = purchase.productType?.toLowerCase().includes('eğitim') || purchase.productType?.toLowerCase().includes('video');
+                              return (
+                                <div key={purchase.id} className="premium-purchase-card glass hover-glow">
+                                  <div className="card-inner">
+                                    <div className="card-top">
+                                      <div className={`product-icon-wrapper ${isCourse ? 'course' : 'asset'}`}>
+                                        {isCourse ? <Video size={24} /> : <FileText size={24} />}
+                                      </div>
+                                      <div className={`product-badge ${isCourse ? 'course' : 'asset'}`}>
+                                        {purchase.productType}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="card-content">
+                                      <h4 className="product-title">{purchase.productName}</h4>
+                                      <div className="product-meta-tags">
+                                        <span className="tag">Dijital Ürün</span>
+                                        <span className="tag-dot">•</span>
+                                        <span className="tag">
+                                          {format(new Date(purchase.purchaseDate), "dd MMM yyyy", { locale: tr })}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="card-footer">
+                                      <div className="product-price">{purchase.price}</div>
+                                      <button className="btn-card-action">
+                                        <span>İçeriğe Git</span>
+                                        <ChevronRight size={16} />
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="purchase-price">{purchase.price}</div>
                                 </div>
-                                <button className="purchase-action-btn">
-                                  <span>İçeriğe Git</span>
-                                  <ChevronRight size={14} />
-                                </button>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       )}
