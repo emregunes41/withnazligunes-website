@@ -370,28 +370,7 @@ function TrialSection({ user, onActivate, loading }) {
       </div>
 
       <div className="trial-content">
-        {!user.isTrialUsed ? (
-          <>
-            <p>Hediye aktivasyon kodunu kullanarak İçerik Paneli'ni 1 hafta boyunca ücretsiz deneyebilirsin.</p>
-            <form onSubmit={onActivate} className="trial-activate-form">
-              <input 
-                type="text" 
-                name="code" 
-                placeholder="Aktivasyon Kodunu Girin" 
-                className="trial-input"
-                required
-              />
-              <button type="submit" disabled={loading} className="trial-btn">
-                {loading ? "Aktif Ediliyor..." : "Aktif Et"}
-              </button>
-            </form>
-          </>
-        ) : isExpired ? (
-          <div className="trial-expired-msg">
-            <AlertCircle size={18} />
-            <span>Deneme süreniz sona erdi.</span>
-          </div>
-        ) : (
+        {user.trialStartDate && !isExpired ? (
           <>
             <p>Deneme sürenin bitmesine kalan zaman:</p>
             <div className="countdown-grid">
@@ -413,6 +392,13 @@ function TrialSection({ user, onActivate, loading }) {
               </div>
             </div>
           </>
+        ) : isExpired ? (
+          <div className="trial-expired-msg">
+            <AlertCircle size={18} />
+            <span>Deneme süreniz sona erdi.</span>
+          </div>
+        ) : (
+          <p>Viral içerik paneline gitmek için <a href="/#creator-panel" className="text-gold font-600">tıklayın</a> ve aktivasyon kodunuzu kullanın.</p>
         )}
       </div>
     </div>

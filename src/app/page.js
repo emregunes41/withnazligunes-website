@@ -24,10 +24,12 @@ import {
   Loader2,
   Cpu,
   AlertTriangle,
+  AlertCircle,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { generateIdeasAction } from "./actions/generate-ideas";
 import { registerMember } from "./actions/register-member";
+import { activateTrial } from "./actions/activate-trial";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -1009,10 +1011,44 @@ function CreatorPanelSection({ session, onAuthRequired }) {
   const [isLoading, setIsLoading] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [aiError, setAiError] = useState(null);
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationError, setActivationError] = useState("");
+  const [activationSuccess, setActivationSuccess] = useState("");
+  const { update } = useSession();
 
   const isTrialActive = session?.user?.trialStartDate && 
     (new Date() - new Date(session.user.trialStartDate)) < 7 * 24 * 60 * 60 * 1000;
   const isLocked = !session || (!isTrialActive && session.user.role !== "ADMIN");
+
+  const handleActivate = async (e) => {
+    e.preventDefault();
+    setIsActivating(true);
+    setActivationError("");
+    setActivationSuccess("");
+
+    const formData = new FormData(e.target);
+    const code = formData.get("code");
+
+    try {
+      const res = await activateTrial(code);
+      if (res.error) {
+        setActivationError(res.error);
+      } else {
+        setActivationSuccess(res.message);
+        // Update session so isLocked becomes false
+        await update({
+          ...session.user,
+          trialStartDate: res.trialStartDate,
+          isTrialUsed: true,
+        });
+        // We'll let the session update trigger a re-render
+      }
+    } catch (err) {
+      setActivationError("Aktivasyon sırasında bir hata oluştu.");
+    } finally {
+      setIsActivating(false);
+    }
+  };
 
   const handleNicheSelect = (id) => {
     if (isLocked) {
@@ -1093,20 +1129,59 @@ function CreatorPanelSection({ session, onAuthRequired }) {
         <div className="creator-panel-body" style={{ position: 'relative' }}>
           {isLocked && (
             <div className="lock-overlay">
-              <div className="lock-content glass glow-gold">
-                <div className="lock-icon-circle">
-                  <Zap style={{ width: 24, height: 24, color: "var(--primary)" }} />
-                </div>
-                <h3>Bu Bölüm Üyelere Özel</h3>
-                <p>Yapay zeka destekli viral fikir üreticisine erişmek için ücretsiz üye ol.</p>
-                <div className="lock-actions">
-                  <button onClick={onAuthRequired} className="btn-primary glow-gold">
-                    Ücretsiz Kayıt Ol →
-                  </button>
-                  <button onClick={onAuthRequired} className="btn-outline">
-                    Giriş Yap
-                  </button>
-                </div>
+              <div className="lock-content glass glow-gold" style={{ maxWidth: '450px' }}>
+                {!session ? (
+                  <>
+                    <div className="lock-icon-circle">
+                      <Zap style={{ width: 24, height: 24, color: "var(--primary)" }} />
+                    </div>
+                    <h3>Bu Bölüm Üyelere Özel</h3>
+                    <p>Yapay zeka destekli viral fikir üreticisine erişmek için ücretsiz üye ol.</p>
+                    <div className="lock-actions">
+                      <button onClick={onAuthRequired} className="btn-primary glow-gold">
+                        Ücretsiz Kayıt Ol →
+                      </button>
+                      <button onClick={onAuthRequired} className="btn-outline">
+                        Giriş Yap
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="lock-icon-circle">
+                      <Zap style={{ width: 24, height: 24, color: "var(--primary)" }} />
+                    </div>
+                    {session.user.isTrialUsed && !isTrialActive ? (
+                      <>
+                        <h3>Deneme Süreniz Doldu</h3>
+                        <p>İçerik Paneli erişim süreniz sona ermiştir. Yeni eğitim ve paketler için takipte kalın!</p>
+                        <a href="/#hizmetler" className="btn-primary glow-gold mt-4">
+                          Hizmetlere Göz At
+                        </a>
+                      </>
+                    ) : (
+                      <>
+                        <h3>Hediye Kodunu Kullan</h3>
+                        <p>1 haftalık ücretsiz deneme süresini başlatmak için aktivasyon kodunu gir.</p>
+                        
+                        <form onSubmit={handleActivate} className="trial-activate-form" style={{ width: '100%', marginTop: '1rem' }}>
+                          <input 
+                            type="text" 
+                            name="code" 
+                            placeholder="Aktivasyon Kodunu Girin" 
+                            className="trial-input"
+                            required
+                          />
+                          <button type="submit" disabled={isActivating} className="trial-btn">
+                            {isActivating ? "Aktif Ediliyor..." : "Aktif Et"}
+                          </button>
+                        </form>
+                        {activationError && <p className="auth-error mt-2" style={{ fontSize: '0.8rem' }}>{activationError}</p>}
+                        {activationSuccess && <p className="profile-success mt-2" style={{ fontSize: '0.8rem' }}>{activationSuccess}</p>}
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           )}
