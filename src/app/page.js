@@ -633,6 +633,7 @@ export default function Home() {
       >
         <img src="/assets/photos/IMG_4102.JPG" alt="" />
       </motion.div>
+    </div>
 
       {/* HERO SECTION */}
       <section className="hero">
@@ -718,14 +719,16 @@ export default function Home() {
       {/* SERVICES SECTION */}
       <hr className="section-divider" />
       <section className="section" id="hizmetler" style={{ position: 'relative' }}>
-        <motion.div 
-          className="floating-img-container" 
-          style={{ bottom: '-10%', left: '-10%', width: '350px', height: '450px', rotate: '-8deg', opacity: 0.1 }}
-          animate={{ y: [0, 20, 0], rotate: [-8, -6, -8] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <img src="/assets/photos/IMG_4326.jpg" alt="" />
-        </motion.div>
+        <div className="floating-imgs-desktop">
+          <motion.div 
+            className="floating-img-container" 
+            style={{ bottom: '-10%', left: '-10%', width: '350px', height: '450px', rotate: '-8deg', opacity: 0.1 }}
+            animate={{ y: [0, 20, 0], rotate: [-8, -6, -8] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img src="/assets/photos/IMG_4326.jpg" alt="" />
+          </motion.div>
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -765,14 +768,16 @@ export default function Home() {
       {/* TRAININGS / DOWNLOADABLES */}
       <hr className="section-divider" />
       <section className="section" id="egitimler" style={{ position: 'relative' }}>
-        <motion.div 
-          className="floating-img-container" 
-          style={{ top: '5%', right: '-12%', width: '400px', height: '500px', rotate: '5deg' }}
-          animate={{ y: [0, -30, 0], rotate: [5, 7, 5] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <img src="/assets/photos/Tezza-9494.JPG" alt="" />
-        </motion.div>
+        <div className="floating-imgs-desktop">
+          <motion.div 
+            className="floating-img-container" 
+            style={{ top: '5%', right: '-12%', width: '400px', height: '500px', rotate: '5deg' }}
+            animate={{ y: [0, -30, 0], rotate: [5, 7, 5] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img src="/assets/photos/Tezza-9494.JPG" alt="" />
+          </motion.div>
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -945,14 +950,16 @@ export default function Home() {
       {/* CTA BANNER */}
       <hr className="section-divider" />
       <section className="section" style={{ textAlign: "center", position: 'relative', overflow: 'hidden' }}>
-        <motion.div 
-          className="floating-img-container" 
-          style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <img src="/assets/photos/Görüntü 11.03.2026 00.01.JPG" alt="" />
-        </motion.div>
+        <div className="floating-imgs-desktop">
+          <motion.div 
+            className="floating-img-container" 
+            style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: '600px', height: '300px', rotate: '-2deg', opacity: 0.05 }}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img src="/assets/photos/Görüntü 11.03.2026 00.01.JPG" alt="" />
+          </motion.div>
+        </div>
         <motion.div
           className="glass glow-gold"
           style={{ padding: "4rem 2rem", borderRadius: "1.5rem", maxWidth: "800px", margin: "0 auto" }}
@@ -999,7 +1006,7 @@ export default function Home() {
         setMode={setAuthMode}
       />
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
-    </>
+    </div>
   );
 }
 
@@ -1017,7 +1024,12 @@ function CreatorPanelSection({ session, onAuthRequired }) {
   const [activationSuccess, setActivationSuccess] = useState("");
   const { update } = useSession();
 
-  const isTrialActive = session?.user?.trialStartDate && 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isTrialActive = isMounted && session?.user?.trialStartDate && 
     (new Date() - new Date(session.user.trialStartDate)) < 7 * 24 * 60 * 60 * 1000;
   const isLocked = !session || (!isTrialActive && session.user.role !== "ADMIN");
 
