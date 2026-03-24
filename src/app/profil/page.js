@@ -184,7 +184,7 @@ export default function ProfilePage() {
                       <div className="loader glow-gold"></div>
                       <p className="mt-4 text-text-muted">Bilgileriniz yükleniyor...</p>
                     </div>
-                  ) : (!userData?.reservations?.length && !userData?.purchases?.length) ? (
+                  ) : (!userData?.reservations?.length && !userData?.purchases?.length && !userData?.isTrialUsed) ? (
                     <div className="profile-empty-state glass">
                       <div className="profile-empty-icon">
                         <Package size={32} />
@@ -202,15 +202,42 @@ export default function ProfilePage() {
                       {/* Trial Section */}
                       <TrialSection user={userData || session.user} onActivate={handleActivateTrial} loading={loading} />
 
-                      {/* Digital Purchases Section */}
-                      {userData.purchases?.length > 0 && (
+                      {/* Digital Purchases Section (Including Trial) */}
+                      {(userData.purchases?.length > 0 || userData.isTrialUsed) && (
                         <div className="purchase-section">
                           <h3 className="section-title">
                             <ShoppingBag size={18} className="text-gold" />
                             Dijital Ürünlerim
                           </h3>
                           <div className="purchase-list">
-                            {userData.purchases.map((purchase) => (
+                            {/* Virtual Trial Item */}
+                            {userData.isTrialUsed && (
+                              <div className="purchase-item glass hover-glow border-gold-subtle">
+                                <div className="purchase-item-header">
+                                  <div className="purchase-item-info">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                      <h4 className="purchase-name">Viral İçerik Paneli (7 Günlük Deneme)</h4>
+                                      <div className="viral-badge" style={{ padding: '2px 6px', fontSize: '10px' }}>DENEME</div>
+                                    </div>
+                                    <div className="purchase-meta">
+                                      <span className="meta-item">Hediye Kodu / Deneme</span>
+                                      <span className="meta-divider">•</span>
+                                      <span className="meta-item">
+                                        {format(new Date(userData.trialStartDate), "dd MMM yyyy", { locale: tr })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="purchase-price">Hediye</div>
+                                </div>
+                                <button onClick={() => router.push('/#creator-panel')} className="purchase-action-btn">
+                                  <span>İçeriğe Git</span>
+                                  <ChevronRight size={14} />
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Real Purchases */}
+                            {userData.purchases?.map((purchase) => (
                               <div key={purchase.id} className="purchase-item glass hover-glow">
                                 <div className="purchase-item-header">
                                   <div className="purchase-item-info">
