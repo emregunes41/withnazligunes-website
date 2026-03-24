@@ -53,7 +53,7 @@ export const authOptions = {
         }
 
         if (user.role === "MEMBER" && !user.isVerified) {
-          throw new Error("UNVERIFIED:" + user.email);
+          throw new Error("UNVERIFIED");
         }
 
         return {

@@ -33,6 +33,7 @@ import { registerMember } from "./actions/register-member";
 import { activateTrial } from "./actions/activate-trial";
 import { resendVerificationCode } from "./actions/resend-verification";
 import { verifyCode } from "./actions/verify-code";
+import { checkLogin } from "./actions/check-login";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -377,6 +378,26 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
     const data = Object.fromEntries(formData);
 
     if (mode === "login") {
+      // Önce hesap durumunu kontrol et
+      const check = await checkLogin(data.email, data.password);
+
+      if (check.status === "unverified") {
+        setVerifyEmail(check.email);
+        setMode("verify");
+        setSuccessMsg("Hesabın henüz doğrulanmamış. Onay kodu tekrar gönderildi.");
+        setResendTimer(60);
+        await resendVerificationCode(check.email);
+        setLoading(false);
+        return;
+      }
+
+      if (check.status === "error") {
+        setError(check.message);
+        setLoading(false);
+        return;
+      }
+
+      // Hesap onaylı, giriş yap
       const res = await signIn("credentials", {
         redirect: false,
         email: data.email,
@@ -384,20 +405,8 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
       });
 
       if (res.error) {
-        // Onaylanmamış hesap — doğrulama ekranına yönlendir
-        if (res.error.includes("UNVERIFIED:")) {
-          const unverifiedEmail = res.error.split("UNVERIFIED:")[1];
-          setVerifyEmail(unverifiedEmail);
-          setMode("verify");
-          setSuccessMsg("Hesabın henüz doğrulanmamış. Onay kodu tekrar gönderildi.");
-          setResendTimer(60);
-          // Kodu otomatik tekrar gönder
-          await resendVerificationCode(unverifiedEmail);
-          setLoading(false);
-        } else {
-          setError(res.error === "CredentialsSignin" ? "Hatalı email veya şifre." : res.error);
-          setLoading(false);
-        }
+        setError("Hatalı email veya şifre.");
+        setLoading(false);
       } else {
         onClose();
         setLoading(false);
