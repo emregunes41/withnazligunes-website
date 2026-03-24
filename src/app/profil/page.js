@@ -4,6 +4,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Calendar, ShoppingBag, Clock, Video, FileText, Zap, AlertCircle } from "lucide-react";
+import { updateUser } from "@/app/actions/update-user";
+import { getUserData } from "@/app/actions/get-user-data";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
+import { activateTrial } from "@/app/actions/activate-trial";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
