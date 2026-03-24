@@ -12,7 +12,7 @@ export async function generateIdeasAction(niche, style) {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash", 
     generationConfig: {
       responseMimeType: "application/json",
     }
@@ -65,18 +65,6 @@ export async function generateIdeasAction(niche, style) {
     return data;
   } catch (error) {
     console.error("Gemini API Error details:", error);
-    let apiErrorMsg = error.message || "Bilinmeyen API Hatası";
-    
-    // Diagnostic: Try to fetch available models
-    try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-      const d = await res.json();
-      if (d && d.models) {
-        const models = d.models.map(m => m.name.replace('models/', '')).filter(n => n.includes('gemini'));
-        apiErrorMsg += ` | Modeller: ${models.slice(0, 5).join(', ')}`;
-      }
-    } catch(e) {}
-
-    return { error: `API_ERROR: ${apiErrorMsg.slice(0, 500)}` };
+    return { error: `API_ERROR: ${error.message || "Bilinmeyen API Hatası"}` };
   }
 }

@@ -14,9 +14,6 @@ export async function getUserData() {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: {
-        reservations: {
-          orderBy: { createdAt: 'desc' }
-        },
         purchases: {
           orderBy: { purchaseDate: 'desc' }
         }

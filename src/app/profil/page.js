@@ -172,36 +172,6 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {/* Reservations Section */}
-                      {userData.reservations?.length > 0 && (
-                        <div className="purchase-section">
-                          <h3 className="section-title">
-                            <Calendar size={18} className="text-gold" />
-                            Randevularım
-                          </h3>
-                          <div className="purchase-list">
-                            {userData.reservations.map((res) => (
-                              <div key={res.id} className="purchase-item glass hover-glow">
-                                <div className="purchase-item-header">
-                                  <div className="purchase-item-info">
-                                    <h4 className="purchase-name">Danışmanlık Randevusu</h4>
-                                    <div className="purchase-meta">
-                                      <span className="meta-item">
-                                        <Clock size={12} />
-                                        {format(new Date(res.date), "dd MMMM yyyy", { locale: tr })} - {res.time}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className={`status-badge ${res.status === 'PAID' ? 'success' : 'pending'}`}>
-                                    {res.status === 'PAID' ? 'Onaylandı' : 'Bekliyor'}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       {/* Digital Purchases Section */}
                       {userData.purchases?.length > 0 && (
                         <div className="purchase-section">
