@@ -31,6 +31,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { generateIdeasAction } from "./actions/generate-ideas";
 import { registerMember } from "./actions/register-member";
 import { activateTrial } from "./actions/activate-trial";
+import { resendVerificationCode } from "./actions/resend-verification";
 import { verifyCode } from "./actions/verify-code";
 
 const fadeUp = {
@@ -354,6 +355,7 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
   const [loading, setLoading] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   
   if (!isOpen) return null;
 
@@ -388,7 +390,32 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
         setVerifyEmail(res.email);
         setMode("verify");
         setSuccessMsg("Kayıt başarılı! Lütfen e-posta adresine gelen 6 haneli kodu gir.");
+        setResendTimer(60);
       }
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
+
+  const handleResend = async () => {
+    if (resendTimer > 0) return;
+    setLoading(true);
+    setError("");
+    const res = await resendVerificationCode(verifyEmail);
+    if (res.error) {
+      setError(res.error);
+    } else {
+      setSuccessMsg("Kod başarıyla yeniden gönderildi.");
+      setResendTimer(60);
     }
     setLoading(false);
   };
@@ -450,6 +477,18 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
               <button type="submit" disabled={loading} className="btn-primary glow-gold w-full mt-4">
                 {loading ? "Doğrulanıyor..." : "Kodu Onayla"}
               </button>
+
+              <div className="resend-box mt-4 text-center">
+                <button 
+                  type="button" 
+                  onClick={handleResend} 
+                  disabled={loading || resendTimer > 0}
+                  className="resend-link"
+                  style={{ color: resendTimer > 0 ? 'var(--text-muted)' : 'var(--primary)', cursor: resendTimer > 0 ? 'default' : 'pointer', background: 'none', border: 'none', fontSize: '0.85rem' }}
+                >
+                  {resendTimer > 0 ? `Kodu Yeniden Gönder (${resendTimer}s)` : "Kodu Yeniden Gönder"}
+                </button>
+              </div>
             </form>
           </div>
         ) : (
