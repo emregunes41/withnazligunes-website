@@ -2,14 +2,19 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Home } from "lucide-react";
+import { User, Package, Settings, LogOut, ChevronRight, Save, CheckCircle, ArrowLeft, Calendar, ShoppingBag, Clock } from "lucide-react";
 import { updateUser } from "@/app/actions/update-user";
+import { getUserData } from "@/app/actions/get-user-data";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('purchases');
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -17,7 +22,19 @@ export default function ProfilePage() {
     if (status === "unauthenticated") {
       router.push("/");
     }
+    if (status === "authenticated") {
+      fetchUserData();
+    }
   }, [status, router]);
+
+  const fetchUserData = async () => {
+    setDataLoading(true);
+    const res = await getUserData();
+    if (res.user) {
+      setUserData(res.user);
+    }
+    setDataLoading(false);
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -132,18 +149,92 @@ export default function ProfilePage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="profile-empty-state glass"
+                  className="profile-purchases-container"
                 >
-                  <div className="profile-empty-icon">
-                    <Package size={32} />
-                  </div>
-                  <h3 className="profile-empty-title">Henüz Bir İçerik Yok</h3>
-                  <p className="profile-empty-text">
-                    Satın almış olduğunuz eğitimler, dijital ürünler ve özel içerikler burada listelenecektir.
-                  </p>
-                  <a href="/#hizmetler" className="profile-shop-btn btn-primary glow-gold">
-                    Eğitimlere Göz At
-                  </a>
+                  {dataLoading ? (
+                    <div className="profile-empty-state glass">
+                      <div className="loader glow-gold"></div>
+                      <p className="mt-4 text-text-muted">Bilgileriniz yükleniyor...</p>
+                    </div>
+                  ) : (!userData?.reservations?.length && !userData?.purchases?.length) ? (
+                    <div className="profile-empty-state glass">
+                      <div className="profile-empty-icon">
+                        <Package size={32} />
+                      </div>
+                      <h3 className="profile-empty-title">Henüz Bir İçerik Yok</h3>
+                      <p className="profile-empty-text">
+                        Satın almış olduğunuz eğitimler, dijital ürünler ve randevularınız burada listelenecektir.
+                      </p>
+                      <a href="/#hizmetler" className="profile-shop-btn btn-primary glow-gold">
+                        Hizmetlere Göz At
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Reservations Section */}
+                      {userData.reservations?.length > 0 && (
+                        <div className="purchase-section">
+                          <h3 className="section-title">
+                            <Calendar size={18} className="text-gold" />
+                            Randevularım
+                          </h3>
+                          <div className="purchase-list">
+                            {userData.reservations.map((res) => (
+                              <div key={res.id} className="purchase-item glass hover-glow">
+                                <div className="purchase-item-header">
+                                  <div className="purchase-item-info">
+                                    <h4 className="purchase-name">Danışmanlık Randevusu</h4>
+                                    <div className="purchase-meta">
+                                      <span className="meta-item">
+                                        <Clock size={12} />
+                                        {format(new Date(res.date), "dd MMMM yyyy", { locale: tr })} - {res.time}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className={`status-badge ${res.status === 'PAID' ? 'success' : 'pending'}`}>
+                                    {res.status === 'PAID' ? 'Onaylandı' : 'Bekliyor'}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Digital Purchases Section */}
+                      {userData.purchases?.length > 0 && (
+                        <div className="purchase-section">
+                          <h3 className="section-title">
+                            <ShoppingBag size={18} className="text-gold" />
+                            Dijital Ürünlerim
+                          </h3>
+                          <div className="purchase-list">
+                            {userData.purchases.map((purchase) => (
+                              <div key={purchase.id} className="purchase-item glass hover-glow">
+                                <div className="purchase-item-header">
+                                  <div className="purchase-item-info">
+                                    <h4 className="purchase-name">{purchase.productName}</h4>
+                                    <div className="purchase-meta">
+                                      <span className="meta-item">{purchase.productType}</span>
+                                      <span className="meta-divider">•</span>
+                                      <span className="meta-item">
+                                        {format(new Date(purchase.purchaseDate), "dd MMM yyyy", { locale: tr })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="purchase-price">{purchase.price}</div>
+                                </div>
+                                <button className="purchase-action-btn">
+                                  <span>İçeriğe Git</span>
+                                  <ChevronRight size={14} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div 

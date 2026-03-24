@@ -15,25 +15,6 @@
   --glow: rgba(200, 165, 92, 0.08);
 }
 
-/* 📸 Pinowed Minimalist White Theme Override */
-.pinowed-theme {
-  --bg: #FFFFFF;
-  --bg-card: #F9FAFB;
-  --bg-card-hover: #F3F4F6;
-  --text: #111827; /* Dark Gray / Black for text */
-  --text-muted: #4B5563;
-  --text-subtle: #9CA3AF;
-  --border: #E5E7EB;
-  --border-hover: #D1D5DB;
-  --primary: #000000; /* Pure black minimalist primary */
-  --primary-hover: #374151;
-  --primary-muted: rgba(0, 0, 0, 0.05);
-  --glow: rgba(0, 0, 0, 0.05);
-  background-color: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
 * {
   margin: 0;
   padding: 0;
