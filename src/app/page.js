@@ -1010,7 +1010,9 @@ function CreatorPanelSection({ session, onAuthRequired }) {
   const [aiRecommendations, setAiRecommendations] = useState(null);
   const [aiError, setAiError] = useState(null);
 
-  const isLocked = !session;
+  const isTrialActive = session?.user?.trialStartDate && 
+    (new Date() - new Date(session.user.trialStartDate)) < 7 * 24 * 60 * 60 * 1000;
+  const isLocked = !session || (!isTrialActive && session.user.role !== "ADMIN");
 
   const handleNicheSelect = (id) => {
     if (isLocked) {

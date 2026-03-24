@@ -60,6 +60,8 @@ export const authOptions = {
           gender: user.gender,
           age: user.age,
           phone: user.phone,
+          trialStartDate: user.trialStartDate,
+          isTrialUsed: user.isTrialUsed,
         };
       },
     }),
@@ -72,6 +74,8 @@ export const authOptions = {
         token.gender = user.gender;
         token.age = user.age;
         token.phone = user.phone;
+        token.trialStartDate = user.trialStartDate;
+        token.isTrialUsed = user.isTrialUsed;
       }
       if (trigger === "update" && session?.name) {
         token.name = session.name;
@@ -88,6 +92,8 @@ export const authOptions = {
         session.user.gender = token.gender;
         session.user.age = token.age;
         session.user.phone = token.phone;
+        session.user.trialStartDate = token.trialStartDate;
+        session.user.isTrialUsed = token.isTrialUsed;
       }
       return session;
     },

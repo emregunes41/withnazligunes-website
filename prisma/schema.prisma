@@ -20,6 +20,8 @@ model User {
   role          String    @default("MEMBER")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  trialStartDate DateTime?
+  isTrialUsed    Boolean   @default(false)
 
   accounts      Account[]
   sessions      Session[]

@@ -8,6 +8,8 @@ import { updateUser } from "@/app/actions/update-user";
 import { getUserData } from "@/app/actions/get-user-data";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import { activateTrial } from "@/app/actions/activate-trial";
+import { Zap, AlertCircle } from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
@@ -59,6 +61,31 @@ export default function ProfilePage() {
         age: data.age,
         phone: data.phone,
       });
+    }
+    setLoading(false);
+  };
+
+  const handleActivateTrial = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    
+    const formData = new FormData(e.target);
+    const code = formData.get("code");
+    
+    const res = await activateTrial(code);
+    
+    if (res.error) {
+      setError(res.error);
+    } else {
+      setSuccess(res.message);
+      await update({
+        ...session.user,
+        trialStartDate: res.trialStartDate,
+        isTrialUsed: true,
+      });
+      fetchUserData();
     }
     setLoading(false);
   };
@@ -172,6 +199,9 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <div className="space-y-6">
+                      {/* Trial Section */}
+                      <TrialSection user={userData || session.user} onActivate={handleActivateTrial} loading={loading} />
+
                       {/* Digital Purchases Section */}
                       {userData.purchases?.length > 0 && (
                         <div className="purchase-section">
@@ -289,6 +319,101 @@ export default function ProfilePage() {
             </AnimatePresence>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function TrialSection({ user, onActivate, loading }) {
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    if (!user.trialStartDate) return;
+
+    const calculateTimeLeft = () => {
+      const startDate = new Date(user.trialStartDate);
+      const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      const diff = endDate - now;
+
+      if (diff <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [user.trialStartDate]);
+
+  const isExpired = user.trialStartDate && !timeLeft;
+
+  return (
+    <div className="trial-card glass glow-gold">
+      <div className="trial-header">
+        <div className="trial-title-group">
+          <Zap className="text-gold" size={20} />
+          <h3 className="trial-title">İçerik Paneli Erişimi</h3>
+          <span className="trial-badge">Beta</span>
+        </div>
+        {user.trialStartDate && !isExpired && (
+          <span className="trial-status-text">Deneme Süresi Aktif</span>
+        )}
+      </div>
+
+      <div className="trial-content">
+        {!user.isTrialUsed ? (
+          <>
+            <p>Hediye aktivasyon kodunu kullanarak İçerik Paneli'ni 1 hafta boyunca ücretsiz deneyebilirsin.</p>
+            <form onSubmit={onActivate} className="trial-activate-form">
+              <input 
+                type="text" 
+                name="code" 
+                placeholder="Aktivasyon Kodunu Girin" 
+                className="trial-input"
+                required
+              />
+              <button type="submit" disabled={loading} className="trial-btn">
+                {loading ? "Aktif Ediliyor..." : "Aktif Et"}
+              </button>
+            </form>
+          </>
+        ) : isExpired ? (
+          <div className="trial-expired-msg">
+            <AlertCircle size={18} />
+            <span>Deneme süreniz sona erdi.</span>
+          </div>
+        ) : (
+          <>
+            <p>Deneme sürenin bitmesine kalan zaman:</p>
+            <div className="countdown-grid">
+              <div className="countdown-box">
+                <span className="countdown-value">{timeLeft?.days || 0}</span>
+                <span className="countdown-label">Gün</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-value">{timeLeft?.hours || 0}</span>
+                <span className="countdown-label">Saat</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-value">{timeLeft?.minutes || 0}</span>
+                <span className="countdown-label">Dak.</span>
+              </div>
+              <div className="countdown-box">
+                <span className="countdown-value">{timeLeft?.seconds || 0}</span>
+                <span className="countdown-label">San.</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
