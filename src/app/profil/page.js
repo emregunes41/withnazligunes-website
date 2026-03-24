@@ -225,6 +225,26 @@ export default function ProfilePage() {
                                         {format(new Date(userData.trialStartDate), "dd MMM yyyy", { locale: tr })}
                                       </span>
                                     </div>
+                                    
+                                    {/* Remaining Time Badge inside card */}
+                                    {(() => {
+                                      const startDate = new Date(userData.trialStartDate);
+                                      const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+                                      const now = new Date();
+                                      const diff = endDate - now;
+                                      if (diff > 0) {
+                                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                                        return (
+                                          <div className="trial-remaining-msg mt-3">
+                                            <Clock size={14} />
+                                            <span>Süre: {days} Gün {hours} Saat Kaldı</span>
+                                          </div>
+                                        );
+                                      } else {
+                                        return <div className="trial-expired-small mt-3">Süre Bitti</div>;
+                                      }
+                                    })()}
                                   </div>
                                   
                                   <div className="card-footer">

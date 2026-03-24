@@ -2091,3 +2091,28 @@ body {
   box-shadow: 0 0 20px var(--primary-glow);
   transform: translateY(-2px);
 }
+
+.trial-remaining-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  width: fit-content;
+  font-weight: 500;
+}
+
+.trial-expired-small {
+  font-size: 0.8rem;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  width: fit-content;
+  font-weight: 500;
+}
+
+.mt-3 { margin-top: 0.75rem; }
