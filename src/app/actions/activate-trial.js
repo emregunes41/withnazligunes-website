@@ -26,6 +26,14 @@ export async function activateTrial(code) {
     }
 
     if (user.isTrialUsed) {
+      const isStillActive = user.trialStartDate && (new Date() - new Date(user.trialStartDate)) < 7 * 24 * 60 * 60 * 1000;
+      if (isStillActive) {
+        return { 
+          success: true, 
+          message: "Deneme süreniz zaten aktif! Panel kilitleri açılıyor...", 
+          trialStartDate: user.trialStartDate 
+        };
+      }
       return { error: "Bu hesap için deneme süresi zaten kullanılmış." };
     }
 
