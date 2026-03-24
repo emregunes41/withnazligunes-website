@@ -40,7 +40,11 @@ export async function registerMember(formData) {
     });
 
     // Mail gönder
-    await sendVerificationEmail(email, name, verificationCode);
+    const mailResult = await sendVerificationEmail(email, name, verificationCode);
+    if (mailResult.error) {
+      console.error("Mail send failed:", mailResult.error);
+      // Hesap oluşturuldu ama mail gönderilemedi — yine de doğrulama ekranını göster
+    }
 
     return { success: true, memberId: user.id, email };
   } catch (error) {

@@ -1,14 +1,18 @@
 "use server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendVerificationEmail(email, name, code) {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error("RESEND_API_KEY not found");
+    const apiKey = process.env.RESEND_API_KEY;
+    
+    if (!apiKey) {
+      console.error("RESEND_API_KEY not found in env");
       return { error: "Mail servisi yapılandırılmamış." };
     }
+
+    console.log("Sending verification email to:", email, "with code:", code);
+
+    const resend = new Resend(apiKey);
 
     const { data, error } = await resend.emails.send({
       from: "Nazlı Güneş <bilgi@withnazligunes.com>",
@@ -39,13 +43,14 @@ export async function sendVerificationEmail(email, name, code) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
+      console.error("Resend API error:", JSON.stringify(error));
       return { error: error.message };
     }
 
+    console.log("Email sent successfully:", JSON.stringify(data));
     return { success: true };
   } catch (err) {
-    console.error("Send mail error:", err);
-    return { error: "Mail gönderilirken bir hata oluştu." };
+    console.error("Send mail catch error:", err.message, err.stack);
+    return { error: "Mail gönderilirken bir hata oluştu: " + err.message };
   }
 }
