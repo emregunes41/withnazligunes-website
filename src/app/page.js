@@ -1118,10 +1118,13 @@ function CreatorPanelSection({ session, onAuthRequired }) {
         className="glass creator-panel-card glow-gold"
       >
         <div className="creator-panel-header">
-          <span className="section-badge">
-            <Zap style={{ width: 12, height: 12 }} />
-            İçerik Paneli
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+            <span className="section-badge" style={{ marginBottom: 0 }}>
+              <Zap style={{ width: 12, height: 12 }} />
+              İçerik Paneli
+            </span>
+            {isTrialActive && <TrialCountdown trialStartDate={session.user.trialStartDate} />}
+          </div>
           <h2 className="section-title">Senin İçin Viral Fikirler</h2>
           <p className="section-subtitle">Nişini ve tarzını seç, Nazlı'nın senin için hazırladığı viral potansiyeli yüksek fikirleri gör.</p>
         </div>
@@ -1392,5 +1395,44 @@ function CreatorPanelSection({ session, onAuthRequired }) {
         </div>
       </motion.div>
     </section>
+  );
+}
+
+function TrialCountdown({ trialStartDate }) {
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    if (!trialStartDate) return;
+
+    const calculateTimeLeft = () => {
+      const startDate = new Date(trialStartDate);
+      const endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const now = new Date();
+      const diff = endDate - now;
+
+      if (diff <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+
+      setTimeLeft({ days, hours, minutes });
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 60000); // Her dakika kontrol et
+    return () => clearInterval(timer);
+  }, [trialStartDate]);
+
+  if (!timeLeft) return null;
+
+  return (
+    <div className="home-trial-countdown">
+      <Clock size={14} />
+      <span>Süre: {timeLeft.days}g {timeLeft.hours}s {timeLeft.minutes}d</span>
+    </div>
   );
 }
