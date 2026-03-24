@@ -53,7 +53,7 @@ export const authOptions = {
         }
 
         if (user.role === "MEMBER" && !user.isVerified) {
-          throw new Error("Lütfen hesabınızı onaylayın. Mail kutunuzu kontrol edin.");
+          throw new Error("UNVERIFIED:" + user.email);
         }
 
         return {

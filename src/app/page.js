@@ -384,8 +384,20 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
       });
 
       if (res.error) {
-        setError(res.error === "CredentialsSignin" ? "Hatalı email veya şifre." : res.error);
-        setLoading(false);
+        // Onaylanmamış hesap — doğrulama ekranına yönlendir
+        if (res.error.includes("UNVERIFIED:")) {
+          const unverifiedEmail = res.error.split("UNVERIFIED:")[1];
+          setVerifyEmail(unverifiedEmail);
+          setMode("verify");
+          setSuccessMsg("Hesabın henüz doğrulanmamış. Onay kodu tekrar gönderildi.");
+          setResendTimer(60);
+          // Kodu otomatik tekrar gönder
+          await resendVerificationCode(unverifiedEmail);
+          setLoading(false);
+        } else {
+          setError(res.error === "CredentialsSignin" ? "Hatalı email veya şifre." : res.error);
+          setLoading(false);
+        }
       } else {
         onClose();
         setLoading(false);
