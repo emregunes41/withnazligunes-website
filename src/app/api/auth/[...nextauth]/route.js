@@ -77,11 +77,13 @@ export const authOptions = {
         token.trialStartDate = user.trialStartDate;
         token.isTrialUsed = user.isTrialUsed;
       }
-      if (trigger === "update" && session?.name) {
-        token.name = session.name;
-        token.gender = session.gender;
-        token.age = session.age;
-        token.phone = session.phone;
+      if (trigger === "update") {
+        if (session?.name) token.name = session.name;
+        if (session?.gender) token.gender = session.gender;
+        if (session?.age) token.age = session.age;
+        if (session?.phone) token.phone = session.phone;
+        if (session?.trialStartDate) token.trialStartDate = session.trialStartDate;
+        if (session?.isTrialUsed !== undefined) token.isTrialUsed = session.isTrialUsed;
       }
       return token;
     },
