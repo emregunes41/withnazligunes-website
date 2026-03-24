@@ -33,7 +33,7 @@ export async function registerMember(formData) {
       },
     });
 
-    return { success: true, memberId: member.id };
+    return { success: true, memberId: user.id };
   } catch (error) {
     console.error("Registration Error:", error);
     return { error: "Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin." };
