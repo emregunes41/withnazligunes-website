@@ -356,6 +356,16 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
   const [verifyEmail, setVerifyEmail] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
   
   if (!isOpen) return null;
 
@@ -379,7 +389,7 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
       } else {
         onClose();
         setLoading(false);
-        window.location.reload(); // Refresh to update session state
+        window.location.reload();
       }
     } else {
       const res = await registerMember(data);
@@ -395,16 +405,6 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    let timer;
-    if (resendTimer > 0) {
-      timer = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [resendTimer]);
 
   const handleResend = async () => {
     if (resendTimer > 0) return;
