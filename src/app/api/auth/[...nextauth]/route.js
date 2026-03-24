@@ -52,6 +52,10 @@ export const authOptions = {
           throw new Error("Hatalı şifre.");
         }
 
+        if (user.role === "MEMBER" && !user.isVerified) {
+          throw new Error("Lütfen hesabınızı onaylayın. Mail kutunuzu kontrol edin.");
+        }
+
         return {
           id: user.id,
           name: user.name,

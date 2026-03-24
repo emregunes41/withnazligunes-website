@@ -25,11 +25,13 @@ import {
   Cpu,
   AlertTriangle,
   AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { generateIdeasAction } from "./actions/generate-ideas";
 import { registerMember } from "./actions/register-member";
 import { activateTrial } from "./actions/activate-trial";
+import { verifyCode } from "./actions/verify-code";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -350,6 +352,8 @@ const RECOMMENDATIONS = {
 function AuthModal({ isOpen, onClose, mode, setMode }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   
   if (!isOpen) return null;
 
@@ -381,23 +385,29 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
         setError(res.error);
         setLoading(false);
       } else {
-        // Auto sign in after registration
-        const signInRes = await signIn("credentials", {
-          redirect: false,
-          email: data.email,
-          password: data.password,
-        });
-        
-        if (signInRes?.error) {
-          setMode("login");
-          setError("Kayıt başarılı ancak giriş yapılamadı. Lütfen şifrenizle giriş yapın.");
-          setLoading(false);
-        } else {
-          onClose();
-          setLoading(false);
-          window.location.reload(); // Refresh to update session state
-        }
+        setVerifyEmail(res.email);
+        setMode("verify");
+        setSuccessMsg("Kayıt başarılı! Lütfen e-posta adresine gelen 6 haneli kodu gir.");
       }
+    }
+    setLoading(false);
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const formData = new FormData(e.target);
+    const code = formData.get("code");
+
+    const res = await verifyCode(verifyEmail, code);
+    if (res.error) {
+      setError(res.error);
+      setLoading(false);
+    } else {
+      setSuccessMsg("Hesabınız doğrulandı! Şimdi giriş yapabilirsiniz.");
+      setMode("login");
+      setLoading(false);
     }
   };
 
@@ -411,7 +421,40 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
       >
         <button className="modal-close" onClick={onClose}><X /></button>
         
-        <div className="auth-tabs">
+        {mode === "verify" ? (
+          <div className="verify-container">
+            <button onClick={() => setMode("register")} className="back-btn-simple">
+              <ArrowLeft size={16} /> Geri Dön
+            </button>
+            <h3 className="modal-title">E-posta Doğrulama</h3>
+            <p className="modal-subtitle">
+              <strong>{verifyEmail}</strong> adresine gönderdiğimiz 6 haneli onay kodunu girin.
+            </p>
+
+            <form onSubmit={handleVerify} className="auth-form mt-6">
+              <div className="form-group">
+                <input 
+                  type="text" 
+                  name="code" 
+                  maxLength={6} 
+                  required 
+                  placeholder="000000" 
+                  className="glass verification-input" 
+                  autoFocus
+                />
+              </div>
+
+              {error && <p className="auth-error">{error}</p>}
+              {successMsg && <p className="auth-success" style={{ color: "var(--primary)", fontSize: "0.85rem", textAlign: "center", marginBottom: "1rem" }}>{successMsg}</p>}
+
+              <button type="submit" disabled={loading} className="btn-primary glow-gold w-full mt-4">
+                {loading ? "Doğrulanıyor..." : "Kodu Onayla"}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <>
+            <div className="auth-tabs">
           <button 
             className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
             onClick={() => setMode('login')}
@@ -487,6 +530,8 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
             Google ile {mode === 'login' ? 'Giriş Yap' : 'Devam Et'}
           </button>
         </form>
+        </>
+        )}
       </motion.div>
     </div>
   );

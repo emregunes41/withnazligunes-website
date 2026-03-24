@@ -2116,3 +2116,53 @@ body {
 }
 
 .mt-3 { margin-top: 0.75rem; }
+
+/* Verification Step Styles */
+.verify-container {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.modal-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.verification-input {
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  padding: 1rem !important;
+  margin-top: 1rem;
+}
+
+.back-btn-simple {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding: 0;
+  width: fit-content;
+  transition: color 0.2s;
+}
+
+.back-btn-simple:hover {
+  color: var(--primary);
+}
+
+.auth-success {
+  background: rgba(197, 165, 114, 0.1);
+  border: 1px solid rgba(197, 165, 114, 0.2);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
