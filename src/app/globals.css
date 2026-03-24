@@ -33,8 +33,9 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
   width: 100%;
+  overflow-x: hidden;
+  position: relative;
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
@@ -137,6 +138,28 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: -0.01em;
+}
+
+@media (max-width: 480px) {
+  .nav-logo-text {
+    font-size: 0.8rem;
+  }
+}
+
+.main-wrapper {
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.floating-imgs-desktop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .floating-imgs-desktop {
+    display: block;
+  }
 }
 
 .nav-links {

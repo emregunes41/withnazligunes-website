@@ -522,7 +522,7 @@ export default function Home() {
   ];
 
   return (
-    <>
+    <div className="main-wrapper">
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="navbar-inner">
@@ -623,11 +623,12 @@ export default function Home() {
       <div className="hero-bg-orb-1" />
       <div className="hero-bg-orb-2" />
 
-      {/* Scattered Background Photos */}
-      <motion.div 
-        className="floating-img-container" 
-        style={{ top: '15%', right: '-5%', width: '300px', height: '400px', rotate: '12deg' }}
-        animate={{ y: [0, -20, 0], rotate: [12, 10, 12] }}
+      {/* Scattered Background Photos - Hidden on Mobile to prevent overflow */}
+      <div className="floating-imgs-desktop">
+        <motion.div 
+          className="floating-img-container" 
+          style={{ top: '15%', right: '-5%', width: '300px', height: '400px', rotate: '12deg' }}
+          animate={{ y: [0, -20, 0], rotate: [12, 10, 12] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       >
         <img src="/assets/photos/IMG_4102.JPG" alt="" />
@@ -1400,8 +1401,10 @@ function CreatorPanelSection({ session, onAuthRequired }) {
 
 function TrialCountdown({ trialStartDate }) {
   const [timeLeft, setTimeLeft] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (!trialStartDate) return;
 
     const calculateTimeLeft = () => {
@@ -1423,11 +1426,11 @@ function TrialCountdown({ trialStartDate }) {
     };
 
     calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 60000); // Her dakika kontrol et
+    const timer = setInterval(calculateTimeLeft, 60000);
     return () => clearInterval(timer);
   }, [trialStartDate]);
 
-  if (!timeLeft) return null;
+  if (!isMounted || !timeLeft) return null;
 
   return (
     <div className="home-trial-countdown">
