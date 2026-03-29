@@ -1,12 +1,24 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  // Vercel'deki sinsi kopyalama hataları (tırnak/boşluk) için ortam değişkenini direkt temizle
+  if (process.env.NEON_DATABASE_URL) {
+    process.env.NEON_DATABASE_URL = process.env.NEON_DATABASE_URL.trim().replace(/^"|"$/g, '');
+  }
+
+  const url = process.env.NEON_DATABASE_URL;
+  
+  return new PrismaClient({
+    datasources: {
+      db: {
+        url: url
+      }
+    }
+  })
 }
 
-// Ignore TypeScript types in JS, just declaring global fallback
-const globalForPrisma = globalThis
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
+export { prisma }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
