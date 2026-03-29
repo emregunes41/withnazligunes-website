@@ -15,7 +15,7 @@ export async function sendVerificationEmail(email, name, code) {
     const resend = new Resend(apiKey);
 
     const { data, error } = await resend.emails.send({
-      from: "Nazlı Güneş <bilgi@withnazligunes.com>",
+      from: "Nazlı Güneş <onboarding@resend.dev>",
       to: [email],
       subject: "Üyeliğini Onayla - With Nazlı Güneş",
       html: `
