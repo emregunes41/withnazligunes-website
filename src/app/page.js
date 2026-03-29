@@ -1184,75 +1184,83 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS SECTION */}
-      <section className="relative w-full max-w-5xl px-6 py-24 mx-auto z-10" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 italic">Birlikte Başardıklarımız</h2>
-          <p style={{ color: "var(--text-muted)" }}>Danışanlarımın başarı hikayeleri ve deneyimleri.</p>
+      <section className="section" style={{ borderTop: "1px solid rgba(255,255,255,0.05)", position: 'relative', zIndex: 10 }}>
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <h2 className="section-title italic">Birlikte Başardıklarımız</h2>
+          <p className="section-subtitle" style={{ margin: '0 auto' }}>Danışanlarımın başarı hikayeleri ve deneyimleri.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-          {dynamicReviews.length > 0 ? (
-            dynamicReviews.map((t, i) => (
-              <motion.div 
-                key={t.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
-                style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
-              >
-                <div className="flex gap-1" style={{ color: "var(--primary)" }}>
-                  {[...Array(t.rating)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: '2rem',
+          textAlign: 'left'
+        }}>
+          {(dynamicReviews.length > 0 ? dynamicReviews : TESTIMONIALS.map((t, i) => ({ ...t, id: i, stars: t.stars || 5 }))).map((t, i) => (
+            <motion.div 
+              key={t.id || i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="glass"
+              style={{ 
+                padding: '2rem', 
+                borderRadius: '2rem', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '1.5rem',
+                border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <div style={{ display: 'flex', gap: '4px', color: 'var(--primary)' }}>
+                {[...Array(t.rating || t.stars || 5)].map((_, idx) => (
+                  <Star key={idx} size={16} style={{ fill: 'var(--primary)' }} />
+                ))}
+              </div>
+              <p style={{ fontSize: '0.95rem', lineHeight: '1.6', fontStyle: 'italic', color: 'rgba(255,255,255,0.9)' }}>
+                "{t.text}"
+              </p>
+              <div style={{ 
+                marginTop: 'auto', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '1rem', 
+                paddingTop: '1.5rem', 
+                borderTop: '1px solid rgba(255,255,255,0.05)' 
+              }}>
+                <div style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '50%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontWeight: '700',
+                  background: 'rgba(200, 165, 92, 0.1)',
+                  color: 'var(--primary)',
+                  border: '1px solid rgba(200, 165, 92, 0.2)'
+                }}>
+                  {t.name[0]}
                 </div>
-                <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
-                <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
-                       style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
-                    {t.name[0]}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold">{t.name}</span>
-                    <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
+                <div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>{t.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t.handle}
                   </div>
                 </div>
-              </motion.div>
-            ))
-          ) : (
-            TESTIMONIALS.map((t, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
-                style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
-              >
-                <div className="flex gap-1" style={{ color: "var(--primary)" }}>
-                  {[...Array(t.stars)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
-                </div>
-                <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
-                <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
-                       style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
-                    {t.name[0]}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold">{t.name}</span>
-                    <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))
-          )}
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div style={{ textAlign: 'center', marginTop: '4rem' }}>
           <button 
             onClick={() => setReviewModalOpen(true)}
-            className="btn-primary glass glow-gold"
-            style={{ padding: "0.8rem 2rem", fontSize: "0.9rem" }}
+            className="btn-primary glow-gold glass"
+            style={{ padding: '1rem 2.5rem' }}
           >
             Sen de Deneyimini Paylaş →
           </button>
