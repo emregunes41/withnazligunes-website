@@ -36,6 +36,7 @@ import { resendVerificationCode } from "./actions/resend-verification";
 import { verifyCode } from "./actions/verify-code";
 import { checkLogin } from "./actions/check-login";
 import { getApprovedReviews, submitReview } from "./actions/reviews";
+import Image from "next/image";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -594,7 +595,13 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
             onClick={() => signIn("google")} 
             className="btn-google w-full glass"
           >
-            <img src="https://www.google.com/favicon.ico" alt="Google" width={18} height={18} />
+            <Image 
+              src="https://www.google.com/favicon.ico" 
+              alt="Google" 
+              width={18} 
+              height={18} 
+              className="mr-2"
+            />
             Google ile {mode === 'login' ? 'Giriş Yap' : 'Devam Et'}
           </button>
         </form>
@@ -738,7 +745,13 @@ export default function Home() {
                 <li>
                   <a href="/profil" className="nav-profile-link">
                     {session.user.image ? (
-                      <img src={session.user.image} alt="Profil" className="nav-profile-img" />
+                      <Image 
+                        src={session.user.image || "/default-avatar.png"} 
+                        alt="Profil" 
+                        width={32} 
+                        height={32} 
+                        className="nav-profile-img" 
+                      />
                     ) : (
                       <div className="nav-profile-circle">{session.user.name?.[0] || 'U'}</div>
                     )}
@@ -832,7 +845,12 @@ export default function Home() {
           animate={{ y: [0, -20, 0], rotate: [12, 10, 12] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       >
-        <img src="/assets/photos/IMG_4102.JPG" alt="" />
+        <Image 
+          src="/assets/photos/IMG_4102.JPG" 
+          alt="Nazlı Güneş" 
+          fill
+          style={{ objectFit: 'cover' }}
+        />
       </motion.div>
     </div>
 
@@ -842,10 +860,14 @@ export default function Home() {
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
             {/* Profile Photo Placeholder */}
             <div style={{ marginBottom: "1.5rem" }}>
-              <img
+              <Image 
                 src="/hero-nazli.jpg"
                 alt="Nazlı Güneş"
+                width={120}
+                height={120}
+                priority
                 className="profile-img float-animation"
+                style={{ borderRadius: "50%", objectFit: "cover" }}
               />
             </div>
           </motion.div>
@@ -927,7 +949,12 @@ export default function Home() {
             animate={{ y: [0, 20, 0], rotate: [-8, -6, -8] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           >
-            <img src="/assets/photos/IMG_4326.jpg" alt="" />
+            <Image 
+              src="/assets/photos/IMG_4326.jpg" 
+              alt="Hakkımda" 
+              fill
+              style={{ objectFit: 'cover' }}
+            />
           </motion.div>
         </div>
         <motion.div
@@ -957,7 +984,13 @@ export default function Home() {
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               <div className="service-title-container">
-                <img src={srv.photo} alt={srv.title} className="service-avatar" />
+                <Image 
+                  src={srv.photo} 
+                  alt={srv.title} 
+                  width={64} 
+                  height={64} 
+                  className="service-avatar" 
+                />
                 <h3>{srv.title}</h3>
               </div>
               <p>{srv.desc}</p>
@@ -976,7 +1009,12 @@ export default function Home() {
             animate={{ y: [0, -30, 0], rotate: [5, 7, 5] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           >
-            <img src="/assets/photos/Tezza-9494.JPG" alt="" />
+            <Image 
+              src="/assets/photos/Tezza-9494.JPG" 
+              alt="İş Birliği" 
+              fill
+              style={{ objectFit: 'cover' }}
+            />
           </motion.div>
         </div>
         <motion.div
@@ -1158,7 +1196,12 @@ export default function Home() {
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           >
-            <img src="/assets/photos/Görüntü 11.03.2026 00.01.JPG" alt="" />
+            <Image 
+              src="/assets/photos/Görüntü 11.03.2026 00.01.JPG" 
+              alt="Nazlı Güneş" 
+              fill
+              style={{ objectFit: 'cover' }}
+            />
           </motion.div>
         </div>
         <motion.div
