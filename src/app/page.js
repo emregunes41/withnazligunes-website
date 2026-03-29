@@ -26,6 +26,7 @@ import {
   AlertTriangle,
   AlertCircle,
   ArrowLeft,
+  Star,
 } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { generateIdeasAction } from "./actions/generate-ideas";
@@ -52,6 +53,12 @@ const NICHES = [
   { id: "finans", label: "Finans & Girişim", icon: "💰" },
   { id: "spor", label: "Spor & Fitness", icon: "💪" },
   { id: "gelisim", label: "Kişisel Gelişim", icon: "🌱" },
+];
+
+const TESTIMONIALS = [
+  { name: "Ayşe Y.", handle: "@aysedesign", text: "Nazlı Hanım ile yaptığımız görüşme profilim için dönüm noktası oldu. İçerik ve kurgu fikirleri gerçekten vizyon katıyor. Kesinlikle tavsiye ederim!", stars: 5 },
+  { name: "Mehmet K.", handle: "@mehmetstudio", text: "Aylık danışmanlık paketi sayesinde Instagram'da büyüme hızım 3 kat arttı. Özellikle senaryo ve kurgu desteği mükemmel. Çok teşekkürler.", stars: 5 },
+  { name: "Selin T.", handle: "@selinbeauty", text: "Profil analizi ve bio düzenlemesi sonrası bile etkileşimlerim fark edilir şekilde arttı. İşini bu kadar profesyonel yapan biriyle çalışmak çok keyifli.", stars: 5 }
 ];
 
 const STYLES = [
@@ -1088,6 +1095,43 @@ export default function Home() {
             <ArrowRight style={{ width: 18, height: 18 }} />
           </a>
         </motion.div>
+      </section>
+
+      {/* TESTIMONIALS SECTION */}
+      <section className="relative w-full max-w-5xl px-6 py-24 mx-auto z-10" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 italic">Birlikte Başardıklarımız</h2>
+          <p style={{ color: "var(--text-muted)" }}>Danışanlarımın başarı hikayeleri ve deneyimleri.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
+              style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
+            >
+              <div className="flex gap-1" style={{ color: "var(--primary)" }}>
+                {[...Array(t.stars)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
+              </div>
+              <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
+              <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
+                     style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
+                  {t.name[0]}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold">{t.name}</span>
+                  <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </section>
 
       {/* FOOTER */}
