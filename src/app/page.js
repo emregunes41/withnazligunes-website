@@ -35,6 +35,7 @@ import { activateTrial } from "./actions/activate-trial";
 import { resendVerificationCode } from "./actions/resend-verification";
 import { verifyCode } from "./actions/verify-code";
 import { checkLogin } from "./actions/check-login";
+import { getApprovedReviews, submitReview } from "./actions/reviews";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -604,11 +605,96 @@ function AuthModal({ isOpen, onClose, mode, setMode }) {
   );
 }
 
+function ReviewModal({ isOpen, onClose }) {
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState({ type: "", text: "" });
+
+  if (!isOpen) return null;
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.target);
+    const res = await submitReview(formData);
+    
+    if (res.error) {
+      setMsg({ type: "error", text: res.error });
+    } else {
+      setMsg({ type: "success", text: res.success });
+      setTimeout(() => {
+        onClose();
+        setMsg({ type: "", text: "" });
+      }, 2000);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div 
+        className="auth-modal glass glow-gold" 
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+      >
+        <button className="modal-close" onClick={onClose}><X /></button>
+        <h3 className="modal-title">Deneyimini Paylaş</h3>
+        <p className="modal-subtitle">Yorumun onaylandıktan sonra ana sayfada görünecektir.</p>
+
+        <form onSubmit={handleSubmit} className="auth-form mt-4">
+          <div className="form-group">
+            <label>Ad Soyad</label>
+            <input type="text" name="name" required placeholder="Adınız Soyadınız" className="glass" />
+          </div>
+          <div className="form-group">
+            <label>Instagram Kullanıcı Adı</label>
+            <input type="text" name="handle" required placeholder="@kullaniciadi" className="glass" />
+          </div>
+          <div className="form-group">
+            <label>Puan</label>
+            <select name="rating" className="glass">
+              <option value="5">5 Yıldız - Mükemmel</option>
+              <option value="4">4 Yıldız - Çok İyi</option>
+              <option value="3">3 Yıldız - Orta</option>
+              <option value="2">2 Yıldız - Kötü</option>
+              <option value="1">1 Yıldız - Çok Kötü</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Yorumunuz</label>
+            <textarea name="text" required placeholder="Deneyimlerinizi buraya yazabilirsiniz..." className="glass" rows={4} style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}></textarea>
+          </div>
+
+          {msg.text && (
+            <p className={msg.type === "error" ? "auth-error" : "auth-success"} style={{ textAlign: "center", marginBottom: "1rem" }}>
+              {msg.text}
+            </p>
+          )}
+
+          <button type="submit" disabled={loading} className="btn-primary glow-gold w-full">
+            {loading ? "Gönderiliyor..." : "Yorumu Gönder"}
+          </button>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login"); // "login" vs "register"
+  const [dynamicReviews, setDynamicReviews] = useState([]);
+
+  useEffect(() => {
+    async function loadReviews() {
+      const res = await getApprovedReviews();
+      setDynamicReviews(res);
+    }
+    loadReviews();
+  }, []);
 
   const services = [
     {
@@ -1105,32 +1191,71 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-          {TESTIMONIALS.map((t, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
-              style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
-            >
-              <div className="flex gap-1" style={{ color: "var(--primary)" }}>
-                {[...Array(t.stars)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
-              </div>
-              <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
-              <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
-                     style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
-                  {t.name[0]}
+          {dynamicReviews.length > 0 ? (
+            dynamicReviews.map((t, i) => (
+              <motion.div 
+                key={t.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
+                style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
+              >
+                <div className="flex gap-1" style={{ color: "var(--primary)" }}>
+                  {[...Array(t.rating)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold">{t.name}</span>
-                  <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
+                <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
+                <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
+                       style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
+                    {t.name[0]}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">{t.name}</span>
+                    <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          ) : (
+            TESTIMONIALS.map((t, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass p-8 rounded-3xl flex flex-col items-start gap-4 hover:border-primary/30 transition-all group"
+                style={{ background: "rgba(255,255,255,0.03)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.05)" }}
+              >
+                <div className="flex gap-1" style={{ color: "var(--primary)" }}>
+                  {[...Array(t.stars)].map((_, idx) => <Star key={idx} className="w-4 h-4" style={{ fill: "var(--primary)" }} />)}
+                </div>
+                <p className="text-sm leading-relaxed italic" style={{ color: "rgba(255,255,255,0.9)" }}>"{t.text}"</p>
+                <div className="mt-auto flex items-center gap-3 pt-6 w-full" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform"
+                       style={{ background: "rgba(212,175,55,0.1)", color: "var(--primary)", border: "1px solid rgba(212,175,55,0.2)" }}>
+                    {t.name[0]}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">{t.name}</span>
+                    <span className="text-[10px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{t.handle}</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </div>
+
+        <div className="text-center mt-12">
+          <button 
+            onClick={() => setReviewModalOpen(true)}
+            className="btn-primary glass glow-gold"
+            style={{ padding: "0.8rem 2rem", fontSize: "0.9rem" }}
+          >
+            Sen de Deneyimini Paylaş →
+          </button>
         </div>
       </section>
 
@@ -1156,6 +1281,10 @@ export default function Home() {
         onClose={() => setAuthModalOpen(false)} 
         mode={authMode}
         setMode={setAuthMode}
+      />
+      <ReviewModal 
+        isOpen={reviewModalOpen} 
+        onClose={() => setReviewModalOpen(false)} 
       />
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
     </div>
