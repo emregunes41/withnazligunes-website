@@ -44,6 +44,9 @@ export async function sendVerificationEmail(email, name, code) {
 
     if (error) {
       console.error("Resend API error:", JSON.stringify(error));
+      if (error.name === "validation_error" && error.statusCode === 403) {
+        console.error("ÖNEMLİ: withnazligunes.com alan adı Resend üzerinde doğrulanmamış. Lütfen Resend.com üzerinden DNS ayarlarınızı yapın.");
+      }
       return { error: error.message };
     }
 
